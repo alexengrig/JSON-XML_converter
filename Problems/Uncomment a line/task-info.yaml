@@ -1,0 +1,12 @@
+type: code
+files:
+- name: src/Main.java
+  visible: true
+  text: "/**\n * The class implements a simple application with the main method.\n\
+    \ */\nclass CommentedSimpleApplication {\n\n    public static void main(String[]\
+    \ args) {\n\t/*\n\t  /* System.out.println(980233);\n\t  // System.out.println(893457);\
+    \ */\n\t  // System.out.println(789722);\n\t*/\n    }\n}"
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/2501
+status: Solved
+record: -1
