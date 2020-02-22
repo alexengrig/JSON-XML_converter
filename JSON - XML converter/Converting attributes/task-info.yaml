@@ -451,17 +451,6 @@ files:
 
     }
   learner_created: false
-- name: src/converter/Main.java
-  visible: true
-  text: |
-    package converter;
-
-    public class Main {
-        public static void main(String[] args) {
-            System.out.println("Hello World!");
-        }
-    }
-  learner_created: false
 - name: src/converter/Element.java
   visible: true
   learner_created: true
@@ -495,9 +484,23 @@ files:
 - name: src/converter/xml/XmlConverter.java
   visible: true
   learner_created: true
-- name: test.txt
+- name: src/converter/Main.java
+  visible: true
+  text: |
+    package converter;
+
+    public class Main {
+        public static void main(String[] args) {
+            System.out.println("Hello World!");
+        }
+    }
+  learner_created: false
+- name: src/converter/json/JsonParser.java
+  visible: true
+  learner_created: true
+- name: src/converter/json/JsonConverter.java
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/projects/61/stages/330/implement
-status: Failed
+status: Solved
 record: -1

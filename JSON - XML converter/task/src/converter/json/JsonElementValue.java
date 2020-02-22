@@ -1,7 +1,7 @@
 package converter.json;
 
 public class JsonElementValue extends JsonValue {
-    private final JsonElement value;
+    public final JsonElement value;
 
     public JsonElementValue(JsonElement value) {
         this.value = value;

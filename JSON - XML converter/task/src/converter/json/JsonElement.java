@@ -7,12 +7,16 @@ import java.util.StringJoiner;
 public class JsonElement {
     public final List<JsonEntity> entities;
 
+    public JsonElement(String name) {
+        this(Collections.singletonList(new JsonEntity(name)));
+    }
+
     public JsonElement(String name, String value) {
-        this(Collections.singletonList(new JsonEntity(name, new JsonSimpleValue(value))));
+        this(Collections.singletonList(new JsonEntity(name, value)));
     }
 
     public JsonElement(String name, JsonElement value) {
-        this(Collections.singletonList(new JsonEntity(name, new JsonElementValue(value))));
+        this(Collections.singletonList(new JsonEntity(name, value)));
     }
 
     public JsonElement(List<JsonEntity> entities) {

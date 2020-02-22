@@ -4,6 +4,10 @@ public class JsonEntity {
     public final String name;
     public final JsonValue value;
 
+    public JsonEntity(String name) {
+        this(name, new JsonSimpleValue());
+    }
+
     public JsonEntity(String name, String value) {
         this(name, new JsonSimpleValue(value));
     }

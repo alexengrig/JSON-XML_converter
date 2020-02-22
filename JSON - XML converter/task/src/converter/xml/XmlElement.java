@@ -29,6 +29,12 @@ public class XmlElement extends Element {
     public String toString() {
         if (value == null && attributes == null) {
             return String.format("<%s/>", name);
+        } else if (value == null) {
+            final StringJoiner attributeJoiner = new StringJoiner(" ");
+            for (XmlAttribute attribute : attributes) {
+                attributeJoiner.add(attribute.toString());
+            }
+            return String.format("<%s %s/>", name, attributeJoiner.toString());
         } else if (attributes == null) {
             return String.format("<%s>%s</%s>", name, value, name);
         } else {
