@@ -1,9 +1,39 @@
 package converter;
 
+import converter.json.JsonElement;
+import converter.xml.XmlConverter;
+import converter.xml.XmlElement;
+import converter.xml.XmlParser;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        final String input = getInputFromFile();
+        final XmlParser xmlParser = new XmlParser();
+        final XmlElement xmlElement = xmlParser.parse(input);
+        final XmlConverter xmlConverter = new XmlConverter();
+        final JsonElement jsonElement = xmlConverter.convertToJson(xmlElement);
+        System.out.println(jsonElement);
+    }
+
+    private static String getInputFromFile() throws IOException {
+        final File file = new File("test.txt");
+        try (final FileReader reader = new FileReader(file)) {
+            final StringBuilder builder = new StringBuilder();
+            final char[] buffer = new char[1024];
+            int count;
+            while ((count = reader.read(buffer)) != -1) {
+                builder.append(new String(buffer, 0, count));
+            }
+            return builder.toString();
+        }
+    }
+
+    public static void main1(String[] args) {
         final Scanner scanner = new Scanner(System.in);
         final String input = scanner.nextLine();
         try {
