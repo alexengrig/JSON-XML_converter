@@ -8,18 +8,20 @@ class Main {
     }
 
     public static void decomposition(int n) {
-        decomposition(n, 0, n - 1, "");
+        if (n > 1) {
+            decomposition(n, n - 1, "");
+        }
         System.out.println(n);
     }
 
-    public static void decomposition(int n, int acc, int max, String prefix) {
+    public static void decomposition(int n, int max, String prefix) {
         if (max > 1) {
-            decomposition(n, acc, max - 1, prefix);
+            decomposition(n, max - 1, prefix);
         }
-        if (acc + max < n) {
-            decomposition(n, acc + max, max, prefix + max + " ");
-        } else if (acc + max == n) {
-            System.out.println(prefix + max + " ");
+        if (n - max > 0) {
+            decomposition(n - max, max, prefix + max + " ");
+        } else if (n - max == 0) {
+            System.out.println(prefix + max);
         }
     }
 }
