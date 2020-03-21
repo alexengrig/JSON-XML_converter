@@ -1,0 +1,24 @@
+type: code
+files:
+- name: src/Main.java
+  visible: true
+  text: |-
+    import java.util.*;
+
+    public class Main {
+
+        public static int convert(Double val) {
+            // write your code here
+        }
+
+        /* Do not change code below */
+        public static void main(String[] args) {
+            Scanner scanner = new Scanner(System.in);
+            Double doubleVal = new Double(scanner.nextDouble() / scanner.nextDouble());
+            System.out.println(convert(doubleVal));
+        }
+    }
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/3819
+status: Solved
+record: -1
