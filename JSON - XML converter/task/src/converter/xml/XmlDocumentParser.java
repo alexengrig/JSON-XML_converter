@@ -15,7 +15,7 @@ public class XmlDocumentParser {
     public XmlElement parse(String input) {
         final List<String> parts = split(input);
         final List<Raw> raws = raw(parts);
-        final List<?> foo = foo(raws);
+        final List<?> foo = convert(raws);
         return null;
     }
 
@@ -54,21 +54,22 @@ public class XmlDocumentParser {
         return raws;
     }
 
-    private List<?> foo(List<Raw> raws) {
-        for (int i = 0; i < raws.size(); i++) {
-            final Raw raw = raws.get(i);
-            if (raw.type == RawType.OPEN) {
-                final Result go = foo(raws, i + 1);
+    private List<?> convert(List<Raw> rawList) {
+        for (int i = 0; i < rawList.size(); i++) {
+            final Raw raw = rawList.get(i);
+            if (raw.type == RawType.EMPTY) {
+//                new XmlElement(raw.name, );
+                final Result go = convert(rawList, i + 1);
             }
         }
         return null;
     }
 
-    private Result foo(List<Raw> raws, int from) {
-        for (int i = from; i < raws.size(); i++) {
-            final Raw raw = raws.get(i);
+    private Result convert(List<Raw> rawList, int from) {
+        for (int i = from; i < rawList.size(); i++) {
+            final Raw raw = rawList.get(i);
             if (raw.type == RawType.OPEN) {
-                final Result result = foo(raws, i + 1);
+                final Result result = convert(rawList, i + 1);
                 new XmlElement(raw.name);
                 i = result.to;
             }
@@ -98,6 +99,10 @@ public class XmlDocumentParser {
 
     private boolean isClosingTag(String tag) {
         return tag.startsWith(START_SLASH) && tag.endsWith(END);
+    }
+
+    private boolean hasAttributes(String tag) {
+        return tag.matches("<\\w+\\s+\\w.*/?>");
     }
 
     private String getTagName(String tag) {

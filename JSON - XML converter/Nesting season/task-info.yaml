@@ -407,42 +407,436 @@ files:
   learner_created: false
 - name: src/converter/json/JsonElement.java
   visible: true
+  text: |
+    package converter.json;
+
+    import java.util.Collections;
+    import java.util.List;
+    import java.util.StringJoiner;
+
+    public class JsonElement {
+        public final List<JsonEntity> entities;
+
+        public JsonElement(String name) {
+            this(Collections.singletonList(new JsonEntity(name)));
+        }
+
+        public JsonElement(String name, String value) {
+            this(Collections.singletonList(new JsonEntity(name, value)));
+        }
+
+        public JsonElement(String name, JsonElement value) {
+            this(Collections.singletonList(new JsonEntity(name, value)));
+        }
+
+        public JsonElement(List<JsonEntity> entities) {
+            this.entities = entities;
+        }
+
+        @Override
+        public String toString() {
+            final StringJoiner entityJoiner = new StringJoiner(",");
+            for (JsonEntity entity : entities) {
+                entityJoiner.add(entity.toString());
+            }
+            return String.format("{%s}", entityJoiner.toString());
+        }
+    }
   learner_created: true
 - name: src/converter/json/JsonElementValue.java
   visible: true
+  text: |
+    package converter.json;
+
+    public class JsonElementValue extends JsonValue {
+        public final JsonElement value;
+
+        public JsonElementValue(JsonElement value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value.toString();
+        }
+    }
   learner_created: true
 - name: src/converter/Element.java
   visible: true
+  text: |
+    package converter;
+
+    public abstract class Element {
+        public final String name;
+        public final String value;
+
+        public Element(String name) {
+            this(name, null);
+        }
+
+        public Element(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+    }
   learner_created: true
 - name: src/converter/json/JsonEntity.java
   visible: true
+  text: |-
+    package converter.json;
+
+    public class JsonEntity {
+        public final String name;
+        public final JsonValue value;
+
+        public JsonEntity(String name) {
+            this(name, new JsonSimpleValue());
+        }
+
+        public JsonEntity(String name, String value) {
+            this(name, new JsonSimpleValue(value));
+        }
+
+        public JsonEntity(String name, JsonElement value) {
+            this(name, new JsonElementValue(value));
+        }
+
+        public JsonEntity(String name, JsonValue value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("\"%s\":%s", name, value.toString());
+        }
+    }
   learner_created: true
 - name: src/converter/json/JsonValue.java
   visible: true
+  text: |
+    package converter.json;
+
+    public abstract class JsonValue {
+    }
   learner_created: true
 - name: src/converter/xml/XmlParser.java
   visible: true
+  text: |
+    package converter.xml;
+
+    import java.util.ArrayList;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+
+    public class XmlParser {
+        private static final String INPUT_REGEX = "^<[a-zA-Z][\\w_-]*(\\s+[a-zA-Z][\\w_-]*(\\s*=\\s*\"\\s*[\\w'-_]*\\s*\")?)*(>[\\w'-_ ]*</[a-zA-Z][\\w_-]*|\\s*/)>$";
+        private static final Pattern ELEMENT_PATTERN = Pattern.compile("[a-zA-Z][\\w_-]*");
+        private static final Pattern ATTRIBUTE_PATTERN = Pattern.compile("\\s+[a-zA-Z][\\w_-]*(\\s*=\\s*\"\\s*[\\w'-_]*\\s*\")?");
+        private static final Pattern VALUE_PATTERN = Pattern.compile(">[\\w'-_][\\w'-_ ]*</");
+
+        public XmlElement parse(String input) {
+            final boolean isValid = input.matches(INPUT_REGEX);
+            if (!isValid) {
+                throw new IllegalArgumentException("No valid input: " + input);
+            }
+            Matcher matcher = ELEMENT_PATTERN.matcher(input);
+            if (!matcher.find()) {
+                throw new IllegalArgumentException("No valid element: " + input);
+            }
+            final String elementName = matcher.group();
+            final ArrayList<XmlAttribute> elementAttributes = new ArrayList<>();
+            matcher = ATTRIBUTE_PATTERN.matcher(input.substring(0, input.indexOf(">")));
+            while (matcher.find()) {
+                final String attribute = matcher.group();
+                if (!attribute.contains("=")) {
+                    elementAttributes.add(new XmlAttribute(attribute.trim()));
+                } else {
+                    final String[] chunks = attribute.split("\\s*=\\s*");
+                    final String attributeName = chunks[0].trim();
+                    final String valueChunk = chunks[1];
+                    final int beginIndex = valueChunk.indexOf("\"");
+                    final int endIndex = valueChunk.indexOf("\"", beginIndex + 1);
+                    final String attributeValue = valueChunk.substring(beginIndex + 1, endIndex);
+                    if (attributeValue.isBlank()) {
+                        elementAttributes.add(new XmlAttribute(attributeName));
+                    } else {
+                        elementAttributes.add(new XmlAttribute(attributeName, attributeValue));
+                    }
+                }
+            }
+            matcher = VALUE_PATTERN.matcher(input);
+            if (!matcher.find()) {
+                if (elementAttributes.isEmpty()) {
+                    return new XmlElement(elementName);
+                } else {
+                    return new XmlElement(elementName, elementAttributes);
+                }
+            }
+            final String value = matcher.group();
+            final String elementValue = value.substring(1, value.length() - 2);
+            return new XmlElement(elementName, elementValue, elementAttributes);
+        }
+    }
   learner_created: true
 - name: src/converter/xml/XmlElement.java
   visible: true
+  text: |
+    package converter.xml;
+
+    import converter.Element;
+
+    import java.util.List;
+    import java.util.StringJoiner;
+
+    public class XmlElement extends Element {
+        public final List<XmlAttribute> attributes;
+
+        public XmlElement(String name) {
+            this(name, null, null);
+        }
+
+        public XmlElement(String name, String value) {
+            this(name, value, null);
+        }
+
+        public XmlElement(String name, List<XmlAttribute> attributes) {
+            this(name, null, attributes);
+        }
+
+        public XmlElement(String name, String value, List<XmlAttribute> attributes) {
+            super(name, value);
+            this.attributes = attributes;
+        }
+
+        @Override
+        public String toString() {
+            if (value == null && attributes == null) {
+                return String.format("<%s/>", name);
+            } else if (value == null) {
+                final StringJoiner attributeJoiner = new StringJoiner(" ");
+                for (XmlAttribute attribute : attributes) {
+                    attributeJoiner.add(attribute.toString());
+                }
+                return String.format("<%s %s/>", name, attributeJoiner.toString());
+            } else if (attributes == null) {
+                return String.format("<%s>%s</%s>", name, value, name);
+            } else {
+                final StringJoiner attributeJoiner = new StringJoiner(" ");
+                for (XmlAttribute attribute : attributes) {
+                    attributeJoiner.add(attribute.toString());
+                }
+                return String.format("<%s %s>%s</%s>", name, attributeJoiner.toString(), value, name);
+            }
+        }
+    }
   learner_created: true
 - name: src/converter/json/JsonSimpleValue.java
   visible: true
+  text: |
+    package converter.json;
+
+    public class JsonSimpleValue extends JsonValue {
+        public final String value;
+
+        public JsonSimpleValue() {
+            this(null);
+        }
+
+        public JsonSimpleValue(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value != null ? String.format("\"%s\"", value) : "null";
+        }
+    }
   learner_created: true
 - name: src/converter/json/JsonParser.java
   visible: true
+  text: |
+    package converter.json;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+    public class JsonParser {
+        private static final String NAME_REGEX = "\"[^\"]+\"";
+        private static final String VALUE_REGEX = "null|\\d+|\"[^\"]*\"";
+        private static final String COLON_REGEX = "\\s*:\\s*";
+        private static final String INPUT_REGEX = "^\\{\\s*" + NAME_REGEX + COLON_REGEX +
+                "(" + VALUE_REGEX + "" +
+                "|\\{\\s*" + NAME_REGEX + COLON_REGEX + "(" + VALUE_REGEX + ")" +
+                "(\\s*,\\s*" + NAME_REGEX + COLON_REGEX + "(" + VALUE_REGEX + "))*\\s*})" +
+                "(\\s*,\\s*" + NAME_REGEX + COLON_REGEX +
+                "(" + VALUE_REGEX + "" +
+                "|\\{\\s*" + NAME_REGEX + COLON_REGEX + "(" + VALUE_REGEX + ")" +
+                "(\\s*,\\s*" + NAME_REGEX + COLON_REGEX + "(" + VALUE_REGEX + "))*\\s*}))*" +
+                "\\s*}$";
+
+        public JsonElement parse(String input) {
+            final boolean isValid = input.matches(INPUT_REGEX);
+            if (!isValid) {
+                throw new IllegalArgumentException("No valid input: " + input);
+            }
+            final int colonIndex = input.indexOf(":");
+            final String rawName = input.substring(0, colonIndex);
+            final String elementName = getElementName(rawName);
+            final String rawValue = input.substring(colonIndex + 1).trim();
+            if (rawValue.startsWith("null")) {
+                return new JsonElement(elementName);
+            } else if (rawName.startsWith("\"")) {
+                final int valueEndIndex = rawName.indexOf("\"", 1);
+                final String elementValue = rawValue.substring(1, valueEndIndex);
+                return new JsonElement(elementName, elementValue);
+            } else if (rawName.startsWith("{")) {
+                final String[] chunks = rawValue.replace("{", "").split("\\s*,\\s*");
+                final List<JsonEntity> elementEntities = new ArrayList<>();
+                for (String chunk : chunks) {
+                    final JsonEntity jsonEntity = parseEntity(chunk);
+                    elementEntities.add(jsonEntity);
+                }
+                return new JsonElement(elementName, new JsonElement(elementEntities));
+            } else {
+                throw new IllegalArgumentException("No valid value" + rawValue);
+            }
+        }
+
+        private JsonEntity parseEntity(String input) {
+            final int colonIndex = input.indexOf(":");
+            final String rawName = input.substring(0, colonIndex);
+            final String elementName = getElementName(rawName);
+            final String rawValue = input.substring(colonIndex + 1).trim();
+            if (rawValue.startsWith("null")) {
+                return new JsonEntity(elementName);
+            } else if (rawValue.startsWith("\"")) {
+                final int valueEndIndex = rawValue.indexOf("\"", 1);
+                final String elementValue = rawValue.substring(1, valueEndIndex);
+                return new JsonEntity(elementName, elementValue);
+            } else {
+                return new JsonEntity(elementName, rawValue);
+            }
+        }
+
+        private String getElementName(String input) {
+            final int nameBeginIndex = input.indexOf("\"");
+            final int nameEndIndex = input.indexOf("\"", nameBeginIndex + 1);
+            return input.substring(nameBeginIndex + 1, nameEndIndex);
+        }
+    }
   learner_created: true
 - name: src/converter/Attribute.java
   visible: true
+  text: |
+    package converter;
+
+    public abstract class Attribute {
+        public final String name;
+        public final String value;
+
+        public Attribute(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+    }
   learner_created: true
 - name: src/converter/xml/XmlAttribute.java
   visible: true
+  text: |
+    package converter.xml;
+
+    import converter.Attribute;
+
+    public class XmlAttribute extends Attribute {
+        public XmlAttribute(String name) {
+            this(name, null);
+        }
+
+        public XmlAttribute(String name, String value) {
+            super(name, value);
+        }
+
+        @Override
+        public String toString() {
+            if (value == null) {
+                return name;
+            } else {
+                return String.format("%s=\"%s\"", name, value);
+            }
+        }
+    }
   learner_created: true
 - name: src/converter/xml/XmlConverter.java
   visible: true
+  text: |
+    package converter.xml;
+
+    import converter.json.JsonElement;
+    import converter.json.JsonEntity;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+    public class XmlConverter {
+        public JsonElement convertToJson(XmlElement element) {
+            final String elementName = element.name;
+            final String elementValue = element.value;
+            final List<XmlAttribute> elementAttributes = element.attributes;
+            if (elementAttributes == null) {
+                return new JsonElement(elementName, elementValue);
+            } else {
+                final List<JsonEntity> entities = new ArrayList<>(elementAttributes.size() + 1);
+                for (XmlAttribute attribute : elementAttributes) {
+                    entities.add(new JsonEntity("@" + attribute.name, attribute.value));
+                }
+                entities.add(new JsonEntity("#" + elementName, elementValue));
+                return new JsonElement(elementName, new JsonElement(entities));
+            }
+        }
+    }
   learner_created: true
 - name: src/converter/json/JsonConverter.java
   visible: true
+  text: |
+    package converter.json;
+
+    import converter.json.JsonElement;
+    import converter.json.JsonElementValue;
+    import converter.json.JsonEntity;
+    import converter.json.JsonSimpleValue;
+    import converter.xml.XmlAttribute;
+    import converter.xml.XmlElement;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+    public class JsonConverter {
+        public XmlElement convert(JsonElement element) {
+            final List<JsonEntity> entities = element.entities;
+            final JsonEntity entity = entities.get(0);
+            if (entity.value == null) {
+                return new XmlElement(entity.name);
+            } else if (entity.value instanceof JsonSimpleValue) {
+                final JsonSimpleValue jsonValue = (JsonSimpleValue) entity.value;
+                return new XmlElement(entity.name, jsonValue.value);
+            } else {
+                final JsonElementValue attributeValue = (JsonElementValue) entity.value;
+                final List<XmlAttribute> attributes = new ArrayList<>();
+                String elementValue = null;
+                for (JsonEntity valueEntity : attributeValue.value.entities) {
+                    final String entityName = valueEntity.name;
+                    final JsonSimpleValue entityValue = (JsonSimpleValue) valueEntity.value;
+                    if (entityName.startsWith("@")) {
+                        attributes.add(new XmlAttribute(entityName.substring(1), entityValue.value));
+                    } else if (entityName.startsWith("#")) {
+                        elementValue = entityValue.value;
+                    }
+                }
+                return new XmlElement(entity.name, elementValue, attributes);
+            }
+        }
+    }
   learner_created: true
 - name: src/converter/xml/XmlDocumentParser.java
   visible: true
