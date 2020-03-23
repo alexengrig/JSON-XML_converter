@@ -1,0 +1,27 @@
+<transaction>
+  <id>
+    <number region="Russia">
+      <nonattr/>
+      <nonattr>
+        <nonattr>
+          <attr id="1"/>
+          <attr id="2">
+            <attr id="3">
+              <email>
+                <to>
+                  <from>
+                    <subject>
+                      <body font="Verdana">
+                        <date day="12" month="12" year="2018"/>
+                      </body>
+                    </subject>
+                  </from>
+                </to>
+              </email>
+            </attr>
+          </attr>
+        </nonattr>
+      </nonattr>
+    </number>
+  </id>
+</transaction>

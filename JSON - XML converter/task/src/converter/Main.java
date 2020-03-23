@@ -3,10 +3,9 @@ package converter;
 import converter.json.JsonConverter;
 import converter.json.JsonElement;
 import converter.json.JsonParser;
-import converter.xml.XmlConverter;
-import converter.xml.XmlDocumentParser;
+import converter.x.XElement;
+import converter.x.XParser;
 import converter.xml.XmlElement;
-import converter.xml.XmlParser;
 
 import java.io.File;
 import java.io.FileReader;
@@ -14,7 +13,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        final XmlElement xml = new XmlDocumentParser().parse("<transaction>\n" +
+        final XElement xml = new XParser().parse("<transaction>\n" +
                 "    <id>6753322</id>\n" +
                 "    <number region=\"Russia\">8-900-000-00-00</number>\n" +
                 "    <nonattr />\n" +
@@ -36,11 +35,7 @@ public class Main {
     private static void task() throws IOException {
         final String input = getInputFromFile();
         if (isXML(input)) {
-            final XmlParser xmlParser = new XmlParser();
-            final XmlElement xmlElement = xmlParser.parse(input);
-            final XmlConverter xmlConverter = new XmlConverter();
-            final JsonElement jsonElement = xmlConverter.convertToJson(xmlElement);
-            System.out.println(jsonElement);
+
         } else if (isJSON(input)) {
             final JsonParser jsonParser = new JsonParser();
             final JsonElement jsonElement = jsonParser.parse(input);

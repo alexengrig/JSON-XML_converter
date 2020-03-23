@@ -1,20 +1,18 @@
-package converter.xml;
-
-import converter.json.JsonValue;
+package converter.x;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class XmlDocumentParser {
-    public static final String START = "<";
-    public static final String END = ">";
-    public static final String SLASH = "/";
-    public static final String START_SLASH = START + SLASH;
-    public static final String SLASH_END = SLASH + END;
+public class XParser {
+    protected static final String START = "<";
+    protected static final String END = ">";
+    protected static final String SLASH = "/";
+    protected static final String START_SLASH = START + SLASH;
+    protected static final String SLASH_END = SLASH + END;
 
-    public XmlElement parse(String input) {
+    public XElement parse(String input) {
         final List<String> parts = split(input);
         final List<Raw> raws = raw(parts);
         final List<?> foo = convert(raws);
@@ -49,7 +47,7 @@ public class XmlDocumentParser {
                 } else {
                     raws.add(Raw.open(name, part));
                 }
-            } else {
+            } else if (!part.isBlank()) {
                 raws.add(Raw.value(part));
             }
         }
@@ -61,46 +59,86 @@ public class XmlDocumentParser {
             final Raw raw = rawList.get(i);
             if (raw.type == RawType.EMPTY) {
                 if (hasAttributes(raw.value)) {
-                    System.out.println(new XmlElement(raw.name, getAttributes(raw)));
+                    System.out.println(new XElement(raw.name, getAttributes(raw)));
                 } else {
-                    System.out.println(new XmlElement(raw.name));
+                    System.out.println(new XElement(raw.name));
                 }
             } else if (raw.type == RawType.OPEN) {
                 final Result result = convert(rawList, i + 1);
                 if (hasAttributes(raw.value)) {
-                    System.out.println(new XmlElement(raw.name, result.value, getAttributes(raw)));
+                    System.out.println(new XElement(raw.name, getAttributes(raw), result.value));
                 } else {
-                    System.out.println(new XmlElement(raw.name, result.value));
+                    System.out.println(new XElement(raw.name, result.value));
                 }
-                i = result.to;
+                i = result.lastIndex;
             }
         }
         return null;
     }
 
     private Result convert(List<Raw> rawList, int from) {
-        for (int i = from; i < rawList.size(); i++) {
-            final Raw raw = rawList.get(i);
-            if (raw.type == RawType.EMPTY) {
-                if (hasAttributes(raw.value)) {
-                    System.out.println(new XmlElement(raw.name, getAttributes(raw)));
-                } else {
-                    System.out.println(new XmlElement(raw.name));
+        final List<XValue> values = new ArrayList<>();
+        final Raw parent = rawList.get(from);
+        boolean isOpen = true;
+        int countOpen = 1;
+        int countClosed = 0;
+        int index;
+        for (index = from + 1; isOpen && index < rawList.size(); index++) {
+            final Raw raw = rawList.get(index);
+            switch (raw.type) {
+                case EMPTY: {
+                    if (hasAttributes(raw.value)) {
+                        values.add(new XElement(raw.name, getAttributes(raw)));
+                    } else {
+                        values.add(new XElement(raw.name));
+                    }
+                    break;
                 }
-            } else if (raw.type == RawType.OPEN) {
-                final Result result = convert(rawList, i + 1);
-                if (hasAttributes(raw.value)) {
-                    System.out.println(new XmlElement(raw.name, result.value, getAttributes(raw)));
-                } else {
-                    System.out.println(new XmlElement(raw.name, result.value));
+                case OPEN: {
+                    final Result result = convert(rawList, index + 1);
+                    if (hasAttributes(raw.value)) {
+                        values.add(new XElement(raw.name, getAttributes(raw), result.value));
+                    } else {
+                        values.add(new XElement(raw.name, result.value));
+                    }
+                    index = result.lastIndex;
+                    break;
                 }
-                i = result.to;
+                case VALUE: {
+                    values.add(new XSimpleValue(raw.value));
+                    isOpen = false;
+                    index++;
+                    break;
+                }
+                case CLOSING: {
+                    if (countOpen == ++countClosed && parent.name.equals(raw.name)) {
+                        isOpen = false;
+                    }
+                    break;
+                }
+                default: {
+                    throw new IllegalArgumentException("Unknown raw type: " + raw.type);
+                }
             }
         }
-        return null;
+        final XValue value;
+        if (values.isEmpty()) {
+            value = new XSimpleValue();
+        } else if (values.size() == 1) {
+            value = values.get(0);
+        } else {
+            value = new XListValue(values);
+        }
+        final XElement element;
+        if (hasAttributes(parent.value)) {
+            element = new XElement(parent.name, getAttributes(parent), value);
+        } else {
+            element = new XElement(parent.name, value);
+        }
+        return new Result(index - 1, element);
     }
 
-    private List<XmlAttribute> getAttributes(Raw raw) {
+    private XAttributes getAttributes(Raw raw) {
         final int beginIndex = START.length() + raw.name.length();
         final String rawValue = raw.value;
         final int rawLength = rawValue.length();
@@ -109,23 +147,23 @@ public class XmlDocumentParser {
                 : rawLength - END.length();
         final String value = rawValue.substring(beginIndex, endIndex);
         final Matcher matcher = Pattern.compile("\\w+(\\s*=\\s*\".*\")?").matcher(value);
-        final ArrayList<XmlAttribute> attributes = new ArrayList<>();
+        final ArrayList<XAttribute> attributes = new ArrayList<>();
         while (matcher.find()) {
             final String rawAttribute = matcher.group();
             attributes.add(getAttribute(rawAttribute));
         }
-        return attributes;
+        return new XAttributes(attributes);
     }
 
-    private XmlAttribute getAttribute(String attribute) {
+    private XAttribute getAttribute(String attribute) {
         if (attribute.matches("\\w+\\s*=.*")) {
             final int index = attribute.indexOf("=");
             final String name = attribute.substring(0, index).trim();
             final String quotedValue = attribute.substring(index + 1).trim();
             final String value = quotedValue.substring(1, quotedValue.length() - 1);
-            return new XmlAttribute(name, value);
+            return new XAttribute(name, value);
         } else {
-            return new XmlAttribute(attribute.trim());
+            return new XAttribute(attribute.trim());
         }
     }
 
@@ -159,18 +197,6 @@ public class XmlDocumentParser {
         OPEN, CLOSING, EMPTY, VALUE
     }
 
-    private static class Result {
-        final int from;
-        final int to;
-        final XmlValue value;
-
-        Result(int from, int to, XmlValue value) {
-            this.from = from;
-            this.to = to;
-            this.value = value;
-        }
-    }
-
     private static class Raw {
         final String name;
         final String value;
@@ -198,4 +224,15 @@ public class XmlDocumentParser {
             return new Raw("", value, RawType.VALUE);
         }
     }
+
+    private static class Result {
+        final int lastIndex;
+        final XValue value;
+
+        Result(int lastIndex, XValue value) {
+            this.lastIndex = lastIndex;
+            this.value = value;
+        }
+    }
+
 }

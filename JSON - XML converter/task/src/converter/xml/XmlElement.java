@@ -12,7 +12,7 @@ public class XmlElement extends Element {
         this(name, null, null);
     }
 
-    public XmlElement(String name, String value) {
+    public XmlElement(String name, XmlValue value) {
         this(name, value, null);
     }
 
@@ -20,7 +20,7 @@ public class XmlElement extends Element {
         this(name, null, attributes);
     }
 
-    public XmlElement(String name, String value, List<XmlAttribute> attributes) {
+    public XmlElement(String name, XmlValue value, List<XmlAttribute> attributes) {
         super(name, value);
         this.attributes = attributes;
     }
