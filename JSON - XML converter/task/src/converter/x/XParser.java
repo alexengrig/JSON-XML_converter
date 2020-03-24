@@ -14,9 +14,8 @@ public class XParser {
 
     public XElement parse(String input) {
         final List<String> parts = split(input);
-        final List<Raw> raws = raw(parts);
-        final List<?> foo = convert(raws);
-        return null;
+        final List<Raw> rawList = raw(parts);
+        return convert(rawList);
     }
 
     private List<String> split(String input) {
@@ -27,58 +26,66 @@ public class XParser {
         while ((end = input.indexOf(ch, begin)) != -1) {
             final boolean isStart = START.equals(ch);
             ch = isStart ? END : START;
-            final String substring = input.substring(begin, (begin = isStart ? end : end + 1));
+            final String substring = input.substring(begin, (begin = isStart ? end : end + 1)).trim();
             if (!substring.isEmpty()) {
-                substrings.add(substring.trim());
+                substrings.add(substring);
             }
         }
         return substrings;
     }
 
     private List<Raw> raw(List<String> parts) {
-        final List<Raw> raws = new ArrayList<>(parts.size());
+        final List<Raw> list = new ArrayList<>(parts.size());
         for (String part : parts) {
             if (isTag(part)) {
                 final String name = getTagName(part);
                 if (isClosingTag(part)) {
-                    raws.add(Raw.closing(name, part));
+                    list.add(Raw.closing(name, part));
                 } else if (isEmptyTag(part)) {
-                    raws.add(Raw.empty(name, part));
+                    list.add(Raw.empty(name, part));
                 } else {
-                    raws.add(Raw.open(name, part));
+                    list.add(Raw.open(name, part));
                 }
-            } else if (!part.isBlank()) {
-                raws.add(Raw.value(part));
+            } else {
+                list.add(Raw.value(part));
             }
         }
-        return raws;
+        return list;
     }
 
-    private List<?> convert(List<Raw> rawList) {
-        for (int i = 0; i < rawList.size(); i++) {
-            final Raw raw = rawList.get(i);
-            if (raw.type == RawType.EMPTY) {
-                if (hasAttributes(raw.value)) {
-                    System.out.println(new XElement(raw.name, getAttributes(raw)));
-                } else {
-                    System.out.println(new XElement(raw.name));
-                }
-            } else if (raw.type == RawType.OPEN) {
-                final Result result = convert(rawList, i + 1);
-                if (hasAttributes(raw.value)) {
-                    System.out.println(new XElement(raw.name, getAttributes(raw), result.value));
-                } else {
-                    System.out.println(new XElement(raw.name, result.value));
-                }
-                i = result.lastIndex;
-            }
+    private XElement convert(List<Raw> rawList) {
+        final Raw root = rawList.get(0);
+        final List<XValue> values = new ArrayList<>();
+        for (int i = 1; i < rawList.size() - 1; i++) {
+            final Result result = convert(rawList, i);
+            values.add(result.value);
+            i = result.lastIndex;
         }
-        return null;
+        final XValue value;
+        if (values.isEmpty()) {
+            value = new XSimpleValue();
+        } else if (values.size() == 1) {
+            value = values.get(0);
+        } else {
+            value = new XListValue(values);
+        }
+        if (hasAttributes(root.value)) {
+            return new XElement(root.name, getAttributes(root), value);
+        } else {
+            return new XElement(root.name, value);
+        }
     }
 
     private Result convert(List<Raw> rawList, int from) {
-        final List<XValue> values = new ArrayList<>();
         final Raw parent = rawList.get(from);
+        if (parent.type == RawType.EMPTY) {
+            if (hasAttributes(parent.value)) {
+                return new Result(from, new XElement(parent.name, getAttributes(parent)));
+            } else {
+                return new Result(from, new XElement(parent.name));
+            }
+        }
+        final List<XValue> values = new ArrayList<>();
         boolean isOpen = true;
         int countOpen = 1;
         int countClosed = 0;

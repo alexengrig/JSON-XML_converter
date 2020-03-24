@@ -1,36 +1,17 @@
-<?xml version="1.0" encoding="UTF-8" ?>
 <transaction>
-  <id>
-    6753322
-  </id>
-  <number region="Russia">
-    8-900-000-00-00
-  </number>
-  <nonattr/>
-  <nonattr>
-  </nonattr>
-  <nonattr>
-    text
-  </nonattr>
-  <attr id="1"/>
-  <attr id="2">
-  </attr>
-  <attr id="3">
-    text
-  </attr>
-  <email>
-    <to>
-      to_example@gmail.com
-    </to>
-    <from>
-      from_example@gmail.com
-    </from>
-    <subject>
-      Project discussion
-    </subject>
-    <body font="Verdana">
-      Body message
-    </body>
-    <date day="12" month="12" year="2018"/>
-  </email>
+    <id>6753322</id>
+    <number region="Russia">8-900-000-00-00</number>
+    <nonattr/>
+    <nonattr></nonattr>
+    <nonattr>text</nonattr>
+    <attr id="1"/>
+    <attr id="2"></attr>
+    <attr id="3">text</attr>
+    <email>
+        <to>to_example@gmail.com</to>
+        <from>from_example@gmail.com</from>
+        <subject>Project discussion</subject>
+        <body font="Verdana">Body message</body>
+        <date day="12" month="12" year="2018"/>
+    </email>
 </transaction>

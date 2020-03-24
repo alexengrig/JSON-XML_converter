@@ -30,6 +30,7 @@ public class Main {
                 "        <date day=\"12\" month=\"12\" year=\"2018\"/>\n" +
                 "    </email>\n" +
                 "</transaction>");
+        System.out.println(xml);
     }
 
     private static void task() throws IOException {
