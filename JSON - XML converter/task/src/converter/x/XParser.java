@@ -15,6 +15,9 @@ public class XParser {
     public XElement parse(String input) {
         final List<String> parts = split(input);
         final List<Raw> rawList = raw(parts);
+        for (Raw raw : rawList) {
+            System.out.println(raw.name + " : " + raw.value + " : " + raw.type);
+        }
         return convert(rawList);
     }
 
@@ -84,6 +87,8 @@ public class XParser {
             } else {
                 return new Result(from, new XElement(parent.name));
             }
+        } else if (parent.type == RawType.VALUE) {
+            return new Result(from, new XSimpleValue(parent.value));
         }
         final List<XValue> values = new ArrayList<>();
         boolean isOpen = true;
@@ -241,5 +246,4 @@ public class XParser {
             this.value = value;
         }
     }
-
 }
