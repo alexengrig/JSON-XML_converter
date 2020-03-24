@@ -15,9 +15,6 @@ public class XParser {
     public XElement parse(String input) {
         final List<String> parts = split(input);
         final List<Raw> rawList = raw(parts);
-        for (Raw raw : rawList) {
-            System.out.println(raw.name + " : " + raw.value + " : " + raw.type);
-        }
         return convert(rawList);
     }
 
@@ -57,26 +54,25 @@ public class XParser {
     }
 
     private XElement convert(List<Raw> rawList) {
-        final Raw root = rawList.get(0);
-        final List<XValue> values = new ArrayList<>();
+        final Raw parent = rawList.get(0);
+        final List<XComplexValue> values = new ArrayList<>();
+        XSimpleValue simpleValue = null;
         for (int i = 1; i < rawList.size() - 1; i++) {
             final Result result = convert(rawList, i);
-            values.add(result.value);
+            if (result.value instanceof XSimpleValue) {
+                simpleValue = (XSimpleValue) result.value;
+                break;
+            }
+            values.add((XComplexValue) result.value);
             i = result.lastIndex;
         }
-        final XValue value;
-        if (values.isEmpty()) {
-            value = new XSimpleValue();
-        } else if (values.size() == 1) {
-            value = values.get(0);
+        final XElement element;
+        if (simpleValue != null) {
+            element = getElement(parent, simpleValue);
         } else {
-            value = new XListValue(values);
+            element = getElement(parent, getValue(values));
         }
-        if (hasAttributes(root.value)) {
-            return new XElement(root.name, getAttributes(root), value);
-        } else {
-            return new XElement(root.name, value);
-        }
+        return element;
     }
 
     private Result convert(List<Raw> rawList, int from) {
@@ -90,7 +86,8 @@ public class XParser {
         } else if (parent.type == RawType.VALUE) {
             return new Result(from, new XSimpleValue(parent.value));
         }
-        final List<XValue> values = new ArrayList<>();
+        final List<XComplexValue> values = new ArrayList<>();
+        XSimpleValue simpleValue = null;
         boolean isOpen = true;
         int countOpen = 1;
         int countClosed = 0;
@@ -117,7 +114,7 @@ public class XParser {
                     break;
                 }
                 case VALUE: {
-                    values.add(new XSimpleValue(raw.value));
+                    simpleValue = new XSimpleValue(raw.value);
                     isOpen = false;
                     index++;
                     break;
@@ -133,21 +130,21 @@ public class XParser {
                 }
             }
         }
-        final XValue value;
-        if (values.isEmpty()) {
-            value = new XSimpleValue();
-        } else if (values.size() == 1) {
-            value = values.get(0);
-        } else {
-            value = new XListValue(values);
-        }
         final XElement element;
-        if (hasAttributes(parent.value)) {
-            element = new XElement(parent.name, getAttributes(parent), value);
+        if (simpleValue != null) {
+            element = getElement(parent, simpleValue);
         } else {
-            element = new XElement(parent.name, value);
+            element = getElement(parent, getValue(values));
         }
         return new Result(index - 1, element);
+    }
+
+    private XElement getElement(Raw raw, XValue value) {
+        if (hasAttributes(raw.value)) {
+            return new XElement(raw.name, getAttributes(raw), value);
+        } else {
+            return new XElement(raw.name, value);
+        }
     }
 
     private XAttributes getAttributes(Raw raw) {
@@ -158,7 +155,7 @@ public class XParser {
                 ? rawLength - SLASH_END.length()
                 : rawLength - END.length();
         final String value = rawValue.substring(beginIndex, endIndex);
-        final Matcher matcher = Pattern.compile("\\w+(\\s*=\\s*\".*\")?").matcher(value);
+        final Matcher matcher = Pattern.compile("\\w+(\\s*=\\s*\"\\w*\")?").matcher(value);
         final ArrayList<XAttribute> attributes = new ArrayList<>();
         while (matcher.find()) {
             final String rawAttribute = matcher.group();
@@ -176,6 +173,16 @@ public class XParser {
             return new XAttribute(name, value);
         } else {
             return new XAttribute(attribute.trim());
+        }
+    }
+
+    private XValue getValue(List<XComplexValue> values) {
+        if (values.isEmpty()) {
+            return new XSimpleValue();
+        } else if (values.size() == 1) {
+            return values.get(0);
+        } else {
+            return new XElements(values);
         }
     }
 

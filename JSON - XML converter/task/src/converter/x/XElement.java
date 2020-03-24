@@ -1,9 +1,9 @@
 package converter.x;
 
-public class XElement extends XValue {
-    private final String name;
-    private final XAttributes attributes;
-    private final XValue value;
+public class XElement extends XComplexValue {
+    protected final String name;
+    protected final XAttributes attributes;
+    protected final XValue value;
 
     public XElement(String name) {
         this(name, null, null);

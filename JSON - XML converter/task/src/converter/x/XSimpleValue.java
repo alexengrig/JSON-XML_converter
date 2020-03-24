@@ -1,7 +1,7 @@
 package converter.x;
 
 public class XSimpleValue extends XValue {
-    private final String value;
+    protected final String value;
 
     public XSimpleValue() {
         this("");

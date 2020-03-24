@@ -5,7 +5,9 @@ import converter.json.JsonElement;
 import converter.json.JsonParser;
 import converter.x.XElement;
 import converter.x.XParser;
+import converter.x.XPrinter;
 import converter.xml.XmlElement;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileReader;
@@ -13,7 +15,13 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        final XElement xml = new XParser().parse("<transaction>\n" +
+        final XElement xml = new XParser().parse(getInputFromFile());
+        new XPrinter().print(xml);
+    }
+
+    @NotNull
+    private static String getExample1() {
+        return "<transaction>\n" +
                 "    <id>6753322</id>\n" +
                 "    <number region=\"Russia\">8-900-000-00-00</number>\n" +
                 "    <nonattr />\n" +
@@ -29,8 +37,7 @@ public class Main {
                 "        <body font=\"Verdana\">Body message</body>\n" +
                 "        <date day=\"12\" month=\"12\" year=\"2018\"/>\n" +
                 "    </email>\n" +
-                "</transaction>");
-        System.out.println(xml);
+                "</transaction>";
     }
 
     private static void task() throws IOException {
