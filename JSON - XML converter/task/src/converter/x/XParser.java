@@ -84,7 +84,9 @@ public class XParser {
                 return new Result(from, new XElement(parent.name));
             }
         } else if (parent.type == RawType.VALUE) {
-            return new Result(from, new XSimpleValue(parent.value));
+            return new Result(from + 1, new XSimpleValue(parent.value));
+        } else if (parent.type == RawType.CLOSING) {
+            return new Result(from, new XSimpleValue());
         }
         final List<XComplexValue> values = new ArrayList<>();
         XSimpleValue simpleValue = null;
@@ -120,7 +122,7 @@ public class XParser {
                     break;
                 }
                 case CLOSING: {
-                    if (countOpen == ++countClosed && parent.name.equals(raw.name)) {
+                    if (parent.name.equals(raw.name) && countOpen == ++countClosed) {
                         isOpen = false;
                     }
                     break;
