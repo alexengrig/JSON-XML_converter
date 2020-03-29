@@ -27,23 +27,70 @@ public class ConverterTest extends BaseStageTest<Clue> {
         allTests = new LinkedHashMap<>();
 
         allTests.put(
-            "<transaction>\n" +
-                "    <id>6753322</id>\n" +
-                "    <number region=\"Russia\">8-900-000-00-00</number>\n" +
-                "    <nonattr />\n" +
-                "    <nonattr></nonattr>\n" +
-                "    <nonattr>text</nonattr>\n" +
-                "    <attr id=\"1\" />\n" +
-                "    <attr id=\"2\"></attr>\n" +
-                "    <attr id=\"3\">text</attr>\n" +
-                "    <email>\n" +
-                "        <to>to_example@gmail.com</to>\n" +
-                "        <from>from_example@gmail.com</from>\n" +
-                "        <subject>Project discussion</subject>\n" +
-                "        <body font=\"Verdana\">Body message</body>\n" +
-                "        <date day=\"12\" month=\"12\" year=\"2018\"/>\n" +
-                "    </email>\n" +
-                "</transaction>",
+            "{\n" +
+                "    \"transaction\": {\n" +
+                "        \"id\": \"6753322\",\n" +
+                "        \"number\": {\n" +
+                "            \"@region\": \"Russia\",\n" +
+                "            \"#number\": \"8-900-000-000\"\n" +
+                "        },\n" +
+                "        \"empty1\": null,\n" +
+                "        \"empty2\": { },\n" +
+                "        \"empty3\": \"\",\n" +
+                "        \"inner1\": {\n" +
+                "            \"inner2\": {\n" +
+                "                \"inner3\": {\n" +
+                "                    \"key1\": \"value1\",\n" +
+                "                    \"key2\": \"value2\"\n" +
+                "                }\n" +
+                "            }\n" +
+                "        },\n" +
+                "        \"inner4\": {\n" +
+                "            \"@\": 123,\n" +
+                "            \"#inner4\": \"value3\"\n" +
+                "        },\n" +
+                "        \"inner5\": {\n" +
+                "            \"@attr1\": 123.456,\n" +
+                "            \"#inner4\": \"value4\"\n" +
+                "        },\n" +
+                "        \"inner6\": {\n" +
+                "            \"@attr2\": 789.321,\n" +
+                "            \"#inner6\": \"value5\"\n" +
+                "        },\n" +
+                "        \"inner7\": {\n" +
+                "            \"#inner7\": \"value6\"\n" +
+                "        },\n" +
+                "        \"inner8\": {\n" +
+                "            \"@attr3\": \"value7\"\n" +
+                "        },\n" +
+                "        \"inner9\": {\n" +
+                "            \"@attr4\": \"value8\",\n" +
+                "            \"#inner9\": \"value9\",\n" +
+                "            \"something\": \"value10\"\n" +
+                "        },\n" +
+                "        \"inner10\": {\n" +
+                "            \"@attr5\": null,\n" +
+                "            \"#inner10\": null\n" +
+                "        },\n" +
+                "        \"inner11\": {\n" +
+                "            \"@\": null,\n" +
+                "            \"#\": null\n" +
+                "        },\n" +
+                "        \"inner12\": {\n" +
+                "            \"@somekey\": \"attrvalue\",\n" +
+                "            \"#inner12\": null,\n" +
+                "            \"somekey\": \"keyvalue\",\n" +
+                "            \"inner12\": \"notnull\"\n" +
+                "        },\n" +
+                "        \"\": {\n" +
+                "            \"#\": null,\n" +
+                "            \"secret\": \"this won't be converted\"\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"meta\": {\n" +
+                "        \"version\": 0.01\n" +
+                "    }\n" +
+                "}",
 
 
             "Element:\n" +
@@ -55,209 +102,300 @@ public class ConverterTest extends BaseStageTest<Clue> {
                 "\n" +
                 "Element:\n" +
                 "path = transaction, number\n" +
-                "value = \"8-900-000-00-00\"\n" +
+                "value = \"8-900-000-000\"\n" +
                 "attributes:\n" +
                 "region = \"Russia\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, nonattr\n" +
+                "path = transaction, empty1\n" +
                 "value = null\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, nonattr\n" +
+                "path = transaction, empty2\n" +
                 "value = \"\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, nonattr\n" +
-                "value = \"text\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, attr\n" +
-                "value = null\n" +
-                "attributes:\n" +
-                "id = \"1\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, attr\n" +
+                "path = transaction, empty3\n" +
                 "value = \"\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner1\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner1, inner2\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner1, inner2, inner3\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner1, inner2, inner3, key1\n" +
+                "value = \"value1\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner1, inner2, inner3, key2\n" +
+                "value = \"value2\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner4\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner4, inner4\n" +
+                "value = \"value3\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner5\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner5, attr1\n" +
+                "value = \"123.456\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner5, inner4\n" +
+                "value = \"value4\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner6\n" +
+                "value = \"value5\"\n" +
                 "attributes:\n" +
-                "id = \"2\"\n" +
+                "attr2 = \"789.321\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, attr\n" +
-                "value = \"text\"\n" +
-                "attributes:\n" +
-                "id = \"3\"\n" +
+                "path = transaction, inner7\n" +
+                "value = \"value6\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, email\n" +
+                "path = transaction, inner8\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, email, to\n" +
-                "value = \"to_example@gmail.com\"\n" +
+                "path = transaction, inner8, attr3\n" +
+                "value = \"value7\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, email, from\n" +
-                "value = \"from_example@gmail.com\"\n" +
+                "path = transaction, inner9\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, email, subject\n" +
-                "value = \"Project discussion\"\n" +
+                "path = transaction, inner9, attr4\n" +
+                "value = \"value8\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, email, body\n" +
-                "value = \"Body message\"\n" +
-                "attributes:\n" +
-                "font = \"Verdana\"\n" +
+                "path = transaction, inner9, inner9\n" +
+                "value = \"value9\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, email, date\n" +
+                "path = transaction, inner9, something\n" +
+                "value = \"value10\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner10\n" +
                 "value = null\n" +
                 "attributes:\n" +
-                "day = \"12\"\n" +
-                "month = \"12\"\n" +
-                "year = \"2018\""
+                "attr5 = \"\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner11\n" +
+                "value = \"\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner12\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner12, somekey\n" +
+                "value = \"keyvalue\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner12, inner12\n" +
+                "value = \"notnull\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = meta\n" +
+                "\n" +
+                "Element:\n" +
+                "path = meta, version\n" +
+                "value = \"0.01\""
         );
 
         allTests.put(
-            "<node>\n" +
-                "    <child name = \"child_name1\" type = \"child_type1\">\n" +
-                "        <subchild id = \"1\" auth=\"auth1\">Value1</subchild>\n" +
-                "    </child>\n" +
-                "    <child name = \"child_name2\" type = \"child_type2\">\n" +
-                "        <subchild id = \"2\" auth=\"auth1\">Value2</subchild>\n" +
-                "        <subchild id = \"3\" auth=\"auth2\">Value3</subchild>\n" +
-                "        <subchild id = \"4\" auth=\"auth3\"></subchild>\n" +
-                "        <subchild id = \"5\" auth=\"auth3\"/>\n" +
-                "    </child>\n" +
-                "</node>",
+            "{\n" +
+                "    \"root1\": {\n" +
+                "        \"@attr1\": \"val1\",\n" +
+                "        \"@attr2\": \"val2\",\n" +
+                "        \"#root1\": {\n" +
+                "            \"elem1\": {\n" +
+                "                \"@attr3\": \"val3\",\n" +
+                "                \"@attr4\": \"val4\",\n" +
+                "                \"#elem1\": \"Value1\"\n" +
+                "            },\n" +
+                "            \"elem2\": {\n" +
+                "                \"@attr5\": \"val5\",\n" +
+                "                \"@attr6\": \"val6\",\n" +
+                "                \"#elem2\": \"Value2\"\n" +
+                "            }\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"root2\": {\n" +
+                "        \"@attr1\": null,\n" +
+                "        \"@attr2\": \"\",\n" +
+                "        \"#root2\": null\n" +
+                "    },\n" +
+                "    \"root3\": {\n" +
+                "        \"@attr1\": \"val2\",\n" +
+                "        \"@attr2\": \"val1\",\n" +
+                "        \"#root3\": \"\"\n" +
+                "    },\n" +
+                "    \"root4\": \"Value4\"\n" +
+                "}",
+
+            "Element:\n" +
+                "path = root1\n" +
+                "attributes:\n" +
+                "attr1 = \"val1\"\n" +
+                "attr2 = \"val2\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = root1, elem1\n" +
+                "value = \"Value1\"\n" +
+                "attributes:\n" +
+                "attr3 = \"val3\"\n" +
+                "attr4 = \"val4\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = root1, elem2\n" +
+                "value = \"Value2\"\n" +
+                "attributes:\n" +
+                "attr5 = \"val5\"\n" +
+                "attr6 = \"val6\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = root2\n" +
+                "value = null\n" +
+                "attributes:\n" +
+                "attr1 = \"\"\n" +
+                "attr2 = \"\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = root3\n" +
+                "value = \"\"\n" +
+                "attributes:\n" +
+                "attr1 = \"val2\"\n" +
+                "attr2 = \"val1\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = root4\n" +
+                "value = \"Value4\""
+        );
+
+        allTests.put("{\"root1\":{\"@attr1\":\"val1\"," +
+            "\"@attr2\":\"val2\",\"#root1\":{\"elem1\":{\"" +
+            "@attr3\":\"val3\",\"@attr4\":\"val4\",\"#ele" +
+            "m1\":\"Value1\"},\"elem2\":{\"@attr5\":\"val" +
+            "5\",\"@attr6\":\"val6\",\"#elem2\":\"Value2\"" +
+            "}}},\"root2\":{\"@attr1\":null,\"@attr2\":\"" +
+            "\",\"#root2\":null},\"root3\":{\"@attr1\":\"" +
+            "val2\",\"@attr2\":\"val1\",\"#root3\":\"\"}," +
+            "\"root4\":\"Value4\"}",
 
 
             "Element:\n" +
-                "path = node\n" +
-                "\n" +
-                "Element:\n" +
-                "path = node, child\n" +
+                "path = root1\n" +
                 "attributes:\n" +
-                "name = \"child_name1\"\n" +
-                "type = \"child_type1\"\n" +
+                "attr1 = \"val1\"\n" +
+                "attr2 = \"val2\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = node, child, subchild\n" +
+                "path = root1, elem1\n" +
                 "value = \"Value1\"\n" +
                 "attributes:\n" +
-                "id = \"1\"\n" +
-                "auth = \"auth1\"\n" +
+                "attr3 = \"val3\"\n" +
+                "attr4 = \"val4\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = node, child\n" +
-                "attributes:\n" +
-                "name = \"child_name2\"\n" +
-                "type = \"child_type2\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = node, child, subchild\n" +
+                "path = root1, elem2\n" +
                 "value = \"Value2\"\n" +
                 "attributes:\n" +
-                "id = \"2\"\n" +
-                "auth = \"auth1\"\n" +
+                "attr5 = \"val5\"\n" +
+                "attr6 = \"val6\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = node, child, subchild\n" +
-                "value = \"Value3\"\n" +
-                "attributes:\n" +
-                "id = \"3\"\n" +
-                "auth = \"auth2\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = node, child, subchild\n" +
-                "value = \"\"\n" +
-                "attributes:\n" +
-                "id = \"4\"\n" +
-                "auth = \"auth3\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = node, child, subchild\n" +
+                "path = root2\n" +
                 "value = null\n" +
                 "attributes:\n" +
-                "id = \"5\"\n" +
-                "auth = \"auth3\""
+                "attr1 = \"\"\n" +
+                "attr2 = \"\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = root3\n" +
+                "value = \"\"\n" +
+                "attributes:\n" +
+                "attr1 = \"val2\"\n" +
+                "attr2 = \"val1\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = root4\n" +
+                "value = \"Value4\""
         );
 
         allTests.put(
-            "<node><child name=\"child_name1\" type=\"chil" +
-                "d_type1\"><subchild id=\"1\" auth=\"auth1\">" +
-                "Value1</subchild></child><child name=\"child" +
-                "_name2\" type=\"child_type2\"><subchild id=\"" +
-                "2\" auth=\"auth1\">Value2</subchild><subchil" +
-                "d id=\"3\" auth=\"auth2\">Value3</subchild><s" +
-                "ubchild id=\"4\" auth=\"auth3\"></subchild><su" +
-                "bchild id=\"5\" auth=\"auth3\"/></child></node>",
-
-
-            "Element:\n" +
-                "path = node\n" +
-                "\n" +
-                "Element:\n" +
-                "path = node, child\n" +
-                "attributes:\n" +
-                "name = \"child_name1\"\n" +
-                "type = \"child_type1\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = node, child, subchild\n" +
-                "value = \"Value1\"\n" +
-                "attributes:\n" +
-                "id = \"1\"\n" +
-                "auth = \"auth1\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = node, child\n" +
-                "attributes:\n" +
-                "name = \"child_name2\"\n" +
-                "type = \"child_type2\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = node, child, subchild\n" +
-                "value = \"Value2\"\n" +
-                "attributes:\n" +
-                "id = \"2\"\n" +
-                "auth = \"auth1\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = node, child, subchild\n" +
-                "value = \"Value3\"\n" +
-                "attributes:\n" +
-                "id = \"3\"\n" +
-                "auth = \"auth2\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = node, child, subchild\n" +
-                "value = \"\"\n" +
-                "attributes:\n" +
-                "id = \"4\"\n" +
-                "auth = \"auth3\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = node, child, subchild\n" +
-                "value = null\n" +
-                "attributes:\n" +
-                "id = \"5\"\n" +
-                "auth = \"auth3\""
-        );
-
-        allTests.put(
-            "<transaction>\n" +
-                "    <id>6753322</id>\n" +
-                "    <number region=\"Russia\">8-900-999-00-00</number>\n" +
-                "    <email>\n" +
-                "        <to>to_example@gmail.com</to>\n" +
-                "        <from>from_example@gmail.com</from>\n" +
-                "        <subject>Project discussion</subject>\n" +
-                "        <body font=\"Verdana\">Body message</body>\n" +
-                "        <date day=\"12\" month=\"12\" year=\"2018\"/>\n" +
-                "    </email>\n" +
-                "</transaction>",
+            "{\n" +
+                "    \"transaction\": {\n" +
+                "        \"id\": \"13243547\",\n" +
+                "        \"number\": {\n" +
+                "            \"@region\": \"USA\",\n" +
+                "            \"#number\": \"8-900-000-999\"\n" +
+                "        },\n" +
+                "        \"inner1\": {\n" +
+                "            \"inner2\": {\n" +
+                "                \"inner3\": {\n" +
+                "                    \"key1\": \"value1\",\n" +
+                "                    \"key2\": \"value2\"\n" +
+                "                }\n" +
+                "            }\n" +
+                "        },\n" +
+                "        \"inner4\": {\n" +
+                "            \"@\": 123,\n" +
+                "            \"#inner4\": \"value3\"\n" +
+                "        },\n" +
+                "        \"inner5\": {\n" +
+                "            \"@attr1\": 123.456,\n" +
+                "            \"#inner4\": \"value4\"\n" +
+                "        },\n" +
+                "        \"inner6\": {\n" +
+                "            \"@attr2\": 789.321,\n" +
+                "            \"#inner6\": \"value5\"\n" +
+                "        },\n" +
+                "        \"inner7\": {\n" +
+                "            \"#inner7\": \"value6\"\n" +
+                "        },\n" +
+                "        \"inner8\": {\n" +
+                "            \"@attr3\": \"value7\"\n" +
+                "        },\n" +
+                "        \"inner9\": {\n" +
+                "            \"@attr4\": \"value8\",\n" +
+                "            \"#inner9\": \"value9\",\n" +
+                "            \"something\": \"value10\"\n" +
+                "        },\n" +
+                "        \"inner10\": {\n" +
+                "            \"@attr5\": null,\n" +
+                "            \"#inner10\": null\n" +
+                "        },\n" +
+                "        \"inner11\": {\n" +
+                "            \"@\": null,\n" +
+                "            \"#\": null\n" +
+                "        },\n" +
+                "        \"inner12\": {\n" +
+                "            \"@somekey\": \"attrvalue\",\n" +
+                "            \"#inner12\": null,\n" +
+                "            \"somekey\": \"keyvalue\",\n" +
+                "            \"inner12\": \"notnull\"\n" +
+                "        },\n" +
+                "        \"\": {\n" +
+                "            \"#\": null,\n" +
+                "            \"secret\": \"this won't be converted\"\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"meta\": {\n" +
+                "        \"version\": 0.01\n" +
+                "    }\n" +
+                "}",
 
 
             "Element:\n" +
@@ -265,42 +403,108 @@ public class ConverterTest extends BaseStageTest<Clue> {
                 "\n" +
                 "Element:\n" +
                 "path = transaction, id\n" +
-                "value = \"6753322\"\n" +
+                "value = \"13243547\"\n" +
                 "\n" +
                 "Element:\n" +
                 "path = transaction, number\n" +
-                "value = \"8-900-999-00-00\"\n" +
+                "value = \"8-900-000-999\"\n" +
                 "attributes:\n" +
-                "region = \"Russia\"\n" +
+                "region = \"USA\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, email\n" +
+                "path = transaction, inner1\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, email, to\n" +
-                "value = \"to_example@gmail.com\"\n" +
+                "path = transaction, inner1, inner2\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, email, from\n" +
-                "value = \"from_example@gmail.com\"\n" +
+                "path = transaction, inner1, inner2, inner3\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, email, subject\n" +
-                "value = \"Project discussion\"\n" +
+                "path = transaction, inner1, inner2, inner3, key1\n" +
+                "value = \"value1\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, email, body\n" +
-                "value = \"Body message\"\n" +
+                "path = transaction, inner1, inner2, inner3, key2\n" +
+                "value = \"value2\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner4\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner4, inner4\n" +
+                "value = \"value3\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner5\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner5, attr1\n" +
+                "value = \"123.456\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner5, inner4\n" +
+                "value = \"value4\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner6\n" +
+                "value = \"value5\"\n" +
                 "attributes:\n" +
-                "font = \"Verdana\"\n" +
+                "attr2 = \"789.321\"\n" +
                 "\n" +
                 "Element:\n" +
-                "path = transaction, email, date\n" +
+                "path = transaction, inner7\n" +
+                "value = \"value6\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner8\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner8, attr3\n" +
+                "value = \"value7\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner9\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner9, attr4\n" +
+                "value = \"value8\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner9, inner9\n" +
+                "value = \"value9\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner9, something\n" +
+                "value = \"value10\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner10\n" +
                 "value = null\n" +
                 "attributes:\n" +
-                "day = \"12\"\n" +
-                "month = \"12\"\n" +
-                "year = \"2018\""
+                "attr5 = \"\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner11\n" +
+                "value = \"\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner12\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner12, somekey\n" +
+                "value = \"keyvalue\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = transaction, inner12, inner12\n" +
+                "value = \"notnull\"\n" +
+                "\n" +
+                "Element:\n" +
+                "path = meta\n" +
+                "\n" +
+                "Element:\n" +
+                "path = meta, version\n" +
+                "value = \"0.01\""
         );
     }
 
@@ -315,6 +519,7 @@ public class ConverterTest extends BaseStageTest<Clue> {
             TestCase<Clue> test = new TestCase<>();
             test.addFile("test.txt", input);
             test.setAttach(new Clue(answer, input));
+
             tests.add(test);
         }
 
