@@ -1,11 +1,9 @@
 package converter;
 
+import converter.js.JsParser;
 import converter.json.JsonConverter;
 import converter.json.JsonElement;
 import converter.json.JsonParser;
-import converter.x.XElement;
-import converter.x.XParser;
-import converter.x.XPrinter;
 import converter.xml.XmlElement;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,29 +13,30 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        final XElement xml = new XParser().parse(getInputFromFile());
-        new XPrinter().print(xml);
+        new JsParser().parse(getExample1());
     }
 
     @NotNull
     private static String getExample1() {
-        return "<transaction>\n" +
-                "    <id>6753322</id>\n" +
-                "    <number region=\"Russia\">8-900-000-00-00</number>\n" +
-                "    <nonattr />\n" +
-                "    <nonattr></nonattr>\n" +
-                "    <nonattr>text</nonattr>\n" +
-                "    <attr id=\"1\" />\n" +
-                "    <attr id=\"2\"></attr>\n" +
-                "    <attr id=\"3\">text</attr>\n" +
-                "    <email>\n" +
-                "        <to>to_example@gmail.com</to>\n" +
-                "        <from>from_example@gmail.com</from>\n" +
-                "        <subject>Project discussion</subject>\n" +
-                "        <body font=\"Verdana\">Body message</body>\n" +
-                "        <date day=\"12\" month=\"12\" year=\"2018\"/>\n" +
-                "    </email>\n" +
-                "</transaction>";
+        return "{\n" +
+                "    \"key\": {\n" +
+                "        \"child_key1\": {\n" +
+                "            \"@attribute1\": \"value1\",\n" +
+                "            \"@attribute2\": \"value2\",\n" +
+                "            \"#child_key1\": \"value3\"\n" +
+                "        },\n" +
+                "        \"child_key2\": \"child_key_value\",\n" +
+                "        \"child_key3\": {\n" +
+                "            \"@attribute1\": \"value4\",\n" +
+                "            \"@attribute2\": \"value5\",\n" +
+                "            \"#child_key3\": null\n" +
+                "        },\n" +
+                "        \"child_key4\": {\n" +
+                "            \"child_child_key1\": \"value1\",\n" +
+                "            \"child_child_key2\": \"value2\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
     }
 
     private static void task() throws IOException {

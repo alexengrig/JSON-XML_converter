@@ -785,6 +785,48 @@ files:
 - name: src/converter/x/XComplexValue.java
   visible: true
   learner_created: true
+- name: src/main/resources/foo.json
+  visible: true
+  learner_created: true
+- name: src/converter/js/JsValue.java
+  visible: true
+  learner_created: true
+- name: src/converter/js/JsObject.java
+  visible: true
+  learner_created: true
+- name: src/converter/js/JsString.java
+  visible: true
+  learner_created: true
+- name: src/converter/js/JsNumber.java
+  visible: true
+  learner_created: true
+- name: src/converter/js/JsInteger.java
+  visible: true
+  learner_created: true
+- name: src/converter/js/JsArray.java
+  visible: true
+  learner_created: true
+- name: src/converter/js/JsDouble.java
+  visible: true
+  learner_created: true
+- name: src/converter/js/JsBoolean.java
+  visible: true
+  learner_created: true
+- name: src/converter/js/JsNull.java
+  visible: true
+  learner_created: true
+- name: src/converter/js/JsEntity.java
+  visible: true
+  learner_created: true
+- name: src/converter/js/JsParser.java
+  visible: true
+  learner_created: true
+- name: src/main/resources/bar.json
+  visible: true
+  learner_created: true
+- name: src/converter/js/JsPrinter.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/61/stages/331/implement
-status: Solved
+status: Failed
 record: 4
