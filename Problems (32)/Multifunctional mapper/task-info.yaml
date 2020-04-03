@@ -1,0 +1,23 @@
+type: code
+files:
+- name: src/Main.java
+  visible: true
+  text: "/**\n * The function accepts a list of mappers and returns an operator that\
+    \ accepts a list of integers\n * and sequentially applies each mapper to each\
+    \ value (perform a transformation)\n */\npublic static final Function<List<IntUnaryOperator>,\
+    \ UnaryOperator<List<Integer>>> multifunctionalMapper =\n\n/**\n * EXAMPLE: the\
+    \ operator transforms each number to the same number (perform the identity transformation)\n\
+    \ *\n * It returns a list of the same numbers.\n */\npublic static final UnaryOperator<List<Integer>>\
+    \ identityTransformation =\n        multifunctionalMapper.apply(Arrays.asList(x\
+    \ -> x, x -> x, x -> x));\n\n/**\n * The operator accepts an integer list. \n\
+    \ * It multiplies by two each integer number and then add one to its.\n * \n *\
+    \ The operator returns transformed integer list.\n */\npublic static final UnaryOperator<List<Integer>>\
+    \ multTwoAndThenAddOneTransformation =\n\n/**\n * The operator accepts an integer\
+    \ list. \n * It squares each integer number and then get the next even number\
+    \ following it.\n * \n * The operator returns transformed integer list.\n */\n\
+    public static final UnaryOperator<List<Integer>> squareAndThenGetNextEvenNumberTransformation\
+    \ ="
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/2434
+status: Solved
+record: -1

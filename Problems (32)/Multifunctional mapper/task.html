@@ -1,0 +1,34 @@
+<b>Multifunctional mapper</b> <a class="right" href="https://hyperskill.org/learn/step/2434">Open on JetBrains Academy</a><br/><br/><html>
+ <head></head>
+ <body>
+  <p>Write three functions:</p>
+  <ol>
+   <li><b>Multifunctional mapper (transformer)</b> that accepts a list of operators (mappers) and returns a new operator. The returned operator accepts a list of integer numbers and sequentially applies each mapper to each number in the list (performs multiple transformations). The result is a list with transformed values.</li>
+   <li>In terms of<b> the multifunctional mapper</b> define <b>an operator that multiplies by two each integer number and then add one to its</b>. The operator is applied to each number in the input list.</li>
+   <li>In terms of <b> the multifunctional mapper </b>define<b> an operator that squares each integer number and then calculates the next even number </b>following it.<b> </b>The operator is also applied to each number in the input list.<br></li>
+  </ol>To simplify the problem all function (represented by objects) are declared,
+  <b> you need to finish their realization</b>. 
+  <br>Look carefully at definition of each function.
+  <br>
+  <b><br>Also there is an example:</b> identity operation that is defined in terms of 
+  <b>the multifunctional mapper</b>. It doesn't changes values in the input list. It repeats identity transformation three times just for example.
+  <br>
+  <br>During testing all operators will be tested (including identity).
+  <br>
+  <br>
+  <b>Example 1.</b> An input list with integer numbers [1, 1, 1, 1].
+  <br>
+  <ul>
+   <li><b>identityTransformation</b> returns the result list [1, 1, 1, 1].</li>
+   <li><b>multTwoAndThenAddOneTransformation </b>returns the result list <b> </b>[3, 3, 3, 3].</li>
+   <li><b>squareAndThenGetNextEvenNumberTransformation</b> returns the result list <b> </b>[2, 2, 2, 2].</li>
+  </ul>
+  <b>Example 2.</b> An input list with integer numbers [1, 2, 3].
+  <br>
+  <ul>
+   <li><b>identityTransformation</b> returns the result list [1, 2, 3].</li>
+   <li><b>multTwoAndThenAddOneTransformation </b>returns the result list <b> </b>[3, 5, 7].</li>
+   <li><b>squareAndThenGetNextEvenNumberTransformation</b> returns the result list <b> </b>[2, 6, 10].</li>
+  </ul>
+ </body>
+</html><br><br><font color="gray">Memory limit: 256 MB</font><br><font color="gray">Time limit: 8 seconds</font><br><br><br/><a href="https://hyperskill.org/learn/step/3579">Show topic summary</a>
