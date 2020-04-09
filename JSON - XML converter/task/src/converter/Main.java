@@ -1,6 +1,8 @@
 package converter;
 
+import converter.js.JsObject;
 import converter.js.JsParser;
+import converter.js.JsPrinter;
 import converter.json.JsonConverter;
 import converter.json.JsonElement;
 import converter.json.JsonParser;
@@ -13,7 +15,8 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        new JsParser().parse(getExample1());
+        final JsObject json = new JsParser().parse(getExample1());
+        new JsPrinter().print(json);
     }
 
     @NotNull

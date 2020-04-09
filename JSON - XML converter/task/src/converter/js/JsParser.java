@@ -17,10 +17,9 @@ public class JsParser {
     protected static final char OPENING_SQUARE_BRACKET = '[';
     protected static final char CLOSING_SQUARE_BRACKET = ']';
 
-    public void parse(String input) {
+    public JsObject parse(String input) {
         final List<EntityRaw> raw = raw(input);
-        final JsObject object = convert(raw);
-        System.out.println(object);
+        return convert(raw);
     }
 
     protected List<EntityRaw> raw(String input) {
