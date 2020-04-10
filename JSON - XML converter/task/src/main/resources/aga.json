@@ -1,12 +1,16 @@
 {
   "transaction": {
-    "id": "6753322",
-    "number": {
-      "@region": "Russia",
-      "#number": "8-900-000-000"
+    "inner13": {
+      "@invalid_attr": {
+        "some_key": "some value"
+      },
+      "#inner13": {
+        "key": "value"
+      }
     },
-    "empty1": null,
-    "empty2": {},
-    "empty3": ""
+    "": {
+      "#": null,
+      "secret": "this won't be converted"
+    }
   }
 }

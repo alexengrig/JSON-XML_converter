@@ -12,33 +12,41 @@ public class JsConverter {
         final List<XElement> elements = new ArrayList<>();
         final List<JsEntity> entities = json.values;
         for (JsEntity entity : entities) {
-            final String name = entity.name;
+            if ("".equals(entity.name) || "@".equals(entity.name) || "#".equals(entity.name)) continue;
+            final String name;
+            if (entity.name.startsWith("@") || entity.name.startsWith("#")) {
+                name = entity.name.substring(1);
+                if (entities.stream().map(e -> e.name).anyMatch(name::equals)) continue;
+            } else {
+                name = entity.name;
+            }
             final JsValue value = entity.value;
             if (value.isSimple()) {
-                elements.add(new XElement(name, new XSimpleValue(value.toString())));
-            } else if (value instanceof JsNull) {
-                elements.add(new XElement(name));
+                if (value instanceof JsNull) {
+                    elements.add(new XElement(name));
+                } else {
+                    elements.add(new XElement(name, new XSimpleValue(value.toString())));
+                }
             } else if (value instanceof JsObject) {
                 final JsObject object = (JsObject) value;
-                final boolean hasXmlAttributes = hasAttributes(object);
-                final boolean hasXmlValue = hasValue(name, object);
-                if (hasXmlAttributes && hasXmlValue) {
-                    final XAttributes xmlAttributes = getXmlAttributes(object);
-                    final XValue xmlValue = getXmlValue(name, object);
-                    if (xmlValue == null) {
-                        elements.add(new XElement(name, xmlAttributes));
+                final boolean isXml = isXml(name, object);
+                if (isXml) {
+                    final boolean hasXmlAttributes = hasAttributes(object);
+                    if (hasXmlAttributes) {
+                        final XAttributes xmlAttributes = getXmlAttributes(object);
+                        final XValue xmlValue = getXmlValue(name, object);
+                        if (xmlValue == null) {
+                            elements.add(new XElement(name, xmlAttributes));
+                        } else {
+                            elements.add(new XElement(name, xmlAttributes, xmlValue));
+                        }
                     } else {
-                        elements.add(new XElement(name, xmlAttributes, xmlValue));
-                    }
-                } else if (hasXmlAttributes) {
-                    final XAttributes xmlAttributes = getXmlAttributes(object);
-                    elements.add(new XElement(name, xmlAttributes));
-                } else if (hasXmlValue) {
-                    final XValue xmlValue = getXmlValue(name, object);
-                    if (xmlValue == null) {
-                        elements.add(new XElement(name));
-                    } else {
-                        elements.add(new XElement(name, xmlValue));
+                        final XValue xmlValue = getXmlValue(name, object);
+                        if (xmlValue == null) {
+                            elements.add(new XElement(name));
+                        } else {
+                            elements.add(new XElement(name, xmlValue));
+                        }
                     }
                 } else {
                     final List<XElement> children = convert(object);
@@ -56,12 +64,24 @@ public class JsConverter {
         return elements;
     }
 
-    private boolean hasAttributes(JsObject object) {
-        return object.values.stream().map(e -> e.name).anyMatch(n -> n.startsWith("@") && n.length() > 1);
+    private boolean isXml(String name, JsObject object) {
+        final boolean isValid = object.values
+                .stream()
+                .allMatch(o -> o.value.isSimple()
+                        && o.name.length() > 1 && (o.name.startsWith("@") || o.name.startsWith("#")));
+        if (!isValid) {
+            return false;
+        }
+        final List<String> values = object.values
+                .stream()
+                .map(e -> e.name)
+                .filter(s -> s.startsWith("#"))
+                .collect(Collectors.toList());
+        return values.size() == 1 && ("#" + name).equals(values.get(0));
     }
 
-    private boolean hasValue(String name, JsObject object) {
-        return object.values.stream().map(e -> e.name).anyMatch(("#" + name)::equals);
+    private boolean hasAttributes(JsObject object) {
+        return object.values.stream().map(e -> e.name).anyMatch(n -> n.startsWith("@") && n.length() > 1);
     }
 
     private XAttributes getXmlAttributes(JsObject object) {
@@ -72,7 +92,14 @@ public class JsConverter {
     }
 
     private XAttribute getXmlAttribute(JsEntity entity) {
-        return new XAttribute(entity.name.substring(1), entity.value.toString());
+        final String name = entity.name.substring(1);
+        final String value;
+        if (entity.value instanceof JsNull) {
+            value = "";
+        } else {
+            value = entity.value.toString();
+        }
+        return new XAttribute(name, value);
     }
 
     private XValue getXmlValue(String name, JsObject object) {

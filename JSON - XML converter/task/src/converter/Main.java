@@ -31,14 +31,18 @@ public class Main {
     private static String getExample1() {
         return "{\n" +
                 "  \"transaction\": {\n" +
-                "    \"id\": \"6753322\",\n" +
-                "    \"number\": {\n" +
-                "      \"@region\": \"Russia\",\n" +
-                "      \"#number\": \"8-900-000-000\"\n" +
+                "    \"inner13\": {\n" +
+                "      \"@invalid_attr\": {\n" +
+                "        \"some_key\": \"some value\"\n" +
+                "      },\n" +
+                "      \"#inner13\": {\n" +
+                "        \"key\": \"value\"\n" +
+                "      }\n" +
                 "    },\n" +
-                "    \"empty1\": null,\n" +
-                "    \"empty2\": {},\n" +
-                "    \"empty3\": \"\"\n" +
+                "    \"\": {\n" +
+                "      \"#\": null,\n" +
+                "      \"secret\": \"this won't be converted\"\n" +
+                "    }\n" +
                 "  }\n" +
                 "}";
     }
