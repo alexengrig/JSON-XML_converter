@@ -1,22 +1,30 @@
 package converter;
 
+import converter.js.JsConverter;
 import converter.js.JsObject;
 import converter.js.JsParser;
 import converter.js.JsPrinter;
 import converter.json.JsonConverter;
 import converter.json.JsonElement;
 import converter.json.JsonParser;
+import converter.x.XElement;
+import converter.x.XPrinter;
 import converter.xml.XmlElement;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        final JsObject json = new JsParser().parse(getExample1());
-        new JsPrinter().print(json);
+        final JsObject json = new JsParser().parse(getInputFromFile());
+        final List<XElement> xmlList = new JsConverter().convert(json);
+        final XPrinter printer = new XPrinter();
+        for (XElement element : xmlList) {
+            printer.print(element);
+        }
     }
 
     @NotNull

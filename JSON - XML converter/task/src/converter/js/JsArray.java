@@ -11,6 +11,11 @@ public class JsArray extends JsValue {
     }
 
     @Override
+    public boolean isSimple() {
+        return false;
+    }
+
+    @Override
     public String toString() {
         final StringJoiner joiner = new StringJoiner(", ");
         for (JsValue value : values) {

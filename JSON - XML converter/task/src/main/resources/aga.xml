@@ -1,0 +1,9 @@
+<key>
+    <child_key1 attribute1="value1" attribute2="value2">value3</child_key1>
+    <child_key2>child_key_value</child_key2>
+    <child_key3 attribute1="value4" attribute2="value5">null</child_key3>
+    <child_key4>
+        <child_child_key1>value1</child_child_key1>
+        <child_child_key2>value2</child_child_key2>
+    </child_key4>
+</key>

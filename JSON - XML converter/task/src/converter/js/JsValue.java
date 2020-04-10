@@ -1,5 +1,11 @@
 package converter.js;
 
 public abstract class JsValue {
-    public abstract String toString();
+    public String toPretty() {
+        return toString();
+    }
+
+    public boolean isSimple() {
+        return true;
+    }
 }

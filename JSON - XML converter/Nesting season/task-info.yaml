@@ -785,9 +785,6 @@ files:
 - name: src/converter/x/XComplexValue.java
   visible: true
   learner_created: true
-- name: src/main/resources/foo.json
-  visible: true
-  learner_created: true
 - name: src/converter/js/JsValue.java
   visible: true
   learner_created: true
@@ -821,10 +818,13 @@ files:
 - name: src/converter/js/JsParser.java
   visible: true
   learner_created: true
-- name: src/main/resources/bar.json
+- name: src/converter/js/JsPrinter.java
   visible: true
   learner_created: true
-- name: src/converter/js/JsPrinter.java
+- name: src/converter/js/JsConverter.java
+  visible: true
+  learner_created: true
+- name: src/main/resources/aga.xml
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/projects/61/stages/331/implement

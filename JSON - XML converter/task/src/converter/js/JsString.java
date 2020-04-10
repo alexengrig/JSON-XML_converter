@@ -8,7 +8,12 @@ public class JsString extends JsValue {
     }
 
     @Override
-    public String toString() {
+    public String toPretty() {
         return String.format("\"%s\"", value);
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 }

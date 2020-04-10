@@ -55,7 +55,7 @@ public class XParser {
 
     private XElement convert(List<Raw> rawList) {
         final Raw parent = rawList.get(0);
-        final List<XComplexValue> values = new ArrayList<>();
+        final List<XElement> values = new ArrayList<>();
         XSimpleValue simpleValue = null;
         for (int i = 1; i < rawList.size() - 1; i++) {
             final Result result = convert(rawList, i);
@@ -63,7 +63,7 @@ public class XParser {
                 simpleValue = (XSimpleValue) result.value;
                 break;
             }
-            values.add((XComplexValue) result.value);
+            values.add((XElement) result.value);
             i = result.lastIndex;
         }
         final XElement element;
@@ -88,7 +88,7 @@ public class XParser {
         } else if (parent.type == RawType.CLOSING) {
             return new Result(from, new XSimpleValue());
         }
-        final List<XComplexValue> values = new ArrayList<>();
+        final List<XElement> values = new ArrayList<>();
         XSimpleValue simpleValue = null;
         boolean isOpen = true;
         int countOpen = 1;
@@ -178,7 +178,7 @@ public class XParser {
         }
     }
 
-    private XValue getValue(List<XComplexValue> values) {
+    private XValue getValue(List<XElement> values) {
         if (values.isEmpty()) {
             return new XSimpleValue();
         } else if (values.size() == 1) {
