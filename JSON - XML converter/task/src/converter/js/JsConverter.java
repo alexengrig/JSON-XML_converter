@@ -4,6 +4,7 @@ import converter.x.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class JsConverter {
@@ -15,6 +16,8 @@ public class JsConverter {
             final JsValue value = entity.value;
             if (value.isSimple()) {
                 elements.add(new XElement(name, new XSimpleValue(value.toString())));
+            } else if (value instanceof JsNull) {
+                elements.add(new XElement(name));
             } else if (value instanceof JsObject) {
                 final JsObject object = (JsObject) value;
                 final boolean hasXmlAttributes = hasAttributes(object);
@@ -22,44 +25,35 @@ public class JsConverter {
                 if (hasXmlAttributes && hasXmlValue) {
                     final XAttributes xmlAttributes = getXmlAttributes(object);
                     final XValue xmlValue = getXmlValue(name, object);
-                    elements.add(new XElement(name, xmlAttributes, xmlValue));
+                    if (xmlValue == null) {
+                        elements.add(new XElement(name, xmlAttributes));
+                    } else {
+                        elements.add(new XElement(name, xmlAttributes, xmlValue));
+                    }
                 } else if (hasXmlAttributes) {
                     final XAttributes xmlAttributes = getXmlAttributes(object);
                     elements.add(new XElement(name, xmlAttributes));
                 } else if (hasXmlValue) {
                     final XValue xmlValue = getXmlValue(name, object);
-                    elements.add(new XElement(name, xmlValue));
+                    if (xmlValue == null) {
+                        elements.add(new XElement(name));
+                    } else {
+                        elements.add(new XElement(name, xmlValue));
+                    }
                 } else {
                     final List<XElement> children = convert(object);
-                    final XElements xmlElements = new XElements(children);
-                    elements.add(new XElement(name, xmlElements));
+                    if (children.isEmpty()) {
+                        elements.add(new XElement(name, new XSimpleValue()));
+                    } else {
+                        final XElements xmlElements = new XElements(children);
+                        elements.add(new XElement(name, xmlElements));
+                    }
                 }
             } else {
                 throw new UnsupportedOperationException("Unsupported JSON value type: " + value);
             }
         }
         return elements;
-//        final JsEntity entity = entities.get(0);
-//        if (entity.value == null) {
-//            return new XElement(entity.name);
-//        } else if (entity.value instanceof JsSimpleValue) {
-//            final JsSimpleValue jsonValue = (JsSimpleValue) entity.value;
-//            return new XElement(entity.name, jsonValue.value);
-//        } else {
-//            final JsElementValue attributeValue = (JsElementValue) entity.value;
-//            final List<XAttribute> attributes = new ArrayList<>();
-//            String elementValue = null;
-//            for (JsEntity valueEntity : attributeValue.value.entities) {
-//                final String entityName = valueEntity.name;
-//                final JsSimpleValue entityValue = (JsSimpleValue) valueEntity.value;
-//                if (entityName.startsWith("@")) {
-//                    attributes.add(new XAttribute(entityName.substring(1), entityValue.value));
-//                } else if (entityName.startsWith("#")) {
-//                    elementValue = entityValue.value;
-//                }
-//            }
-//            return new XElement(entity.name, elementValue, attributes);
-//        }
     }
 
     private boolean hasAttributes(JsObject object) {
@@ -84,8 +78,13 @@ public class JsConverter {
     private XValue getXmlValue(String name, JsObject object) {
         return object.values.stream()
                 .filter(e -> ("#" + name).equals(e.name))
-                .map(e -> new XSimpleValue(e.value.toString()))
+                .map(e -> e.value)
+                .filter(Objects::nonNull)
+                .filter(v -> !(v instanceof JsNull))
+                .map(Objects::toString)
+                .filter(s -> !s.isEmpty())
+                .map(XSimpleValue::new)
                 .findFirst()
-                .orElseGet(XSimpleValue::new);
+                .orElse(null);
     }
 }

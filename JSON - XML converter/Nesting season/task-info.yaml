@@ -827,6 +827,9 @@ files:
 - name: src/main/resources/aga.xml
   visible: true
   learner_created: true
+- name: src/main/resources/aga.json
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/61/stages/331/implement
 status: Failed
 record: 4

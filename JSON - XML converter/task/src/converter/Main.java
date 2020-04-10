@@ -30,23 +30,16 @@ public class Main {
     @NotNull
     private static String getExample1() {
         return "{\n" +
-                "    \"key\": {\n" +
-                "        \"child_key1\": {\n" +
-                "            \"@attribute1\": \"value1\",\n" +
-                "            \"@attribute2\": \"value2\",\n" +
-                "            \"#child_key1\": \"value3\"\n" +
-                "        },\n" +
-                "        \"child_key2\": \"child_key_value\",\n" +
-                "        \"child_key3\": {\n" +
-                "            \"@attribute1\": \"value4\",\n" +
-                "            \"@attribute2\": \"value5\",\n" +
-                "            \"#child_key3\": null\n" +
-                "        },\n" +
-                "        \"child_key4\": {\n" +
-                "            \"child_child_key1\": \"value1\",\n" +
-                "            \"child_child_key2\": \"value2\"\n" +
-                "        }\n" +
-                "    }\n" +
+                "  \"transaction\": {\n" +
+                "    \"id\": \"6753322\",\n" +
+                "    \"number\": {\n" +
+                "      \"@region\": \"Russia\",\n" +
+                "      \"#number\": \"8-900-000-000\"\n" +
+                "    },\n" +
+                "    \"empty1\": null,\n" +
+                "    \"empty2\": {},\n" +
+                "    \"empty3\": \"\"\n" +
+                "  }\n" +
                 "}";
     }
 

@@ -1,0 +1,12 @@
+{
+  "transaction": {
+    "id": "6753322",
+    "number": {
+      "@region": "Russia",
+      "#number": "8-900-000-000"
+    },
+    "empty1": null,
+    "empty2": {},
+    "empty3": ""
+  }
+}
