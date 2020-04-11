@@ -31,8 +31,8 @@ public class JsConverter {
                 final JsObject object = (JsObject) value;
                 final boolean isXml = isXml(name, object);
                 if (isXml) {
-                    final boolean hasXmlAttributes = hasAttributes(object);
-                    if (hasXmlAttributes) {
+                    final boolean hasXmlAttributes = hasXmlAttributes(object);
+                    if (hasXmlAttributes && hasXmlValue(name, object)) {
                         final XAttributes xmlAttributes = getXmlAttributes(object);
                         final XValue xmlValue = getXmlValue(name, object);
                         if (xmlValue == null) {
@@ -67,8 +67,8 @@ public class JsConverter {
     private boolean isXml(String name, JsObject object) {
         final boolean isValid = object.values
                 .stream()
-                .allMatch(o -> o.value.isSimple()
-                        && o.name.length() > 1 && (o.name.startsWith("@") || o.name.startsWith("#")));
+                .allMatch(o -> o.name.length() > 1
+                        && ((o.name.startsWith("@") && o.value.isSimple()) || o.name.startsWith("#")));
         if (!isValid) {
             return false;
         }
@@ -80,8 +80,12 @@ public class JsConverter {
         return values.size() == 1 && ("#" + name).equals(values.get(0));
     }
 
-    private boolean hasAttributes(JsObject object) {
+    private boolean hasXmlAttributes(JsObject object) {
         return object.values.stream().map(e -> e.name).anyMatch(n -> n.startsWith("@") && n.length() > 1);
+    }
+
+    private boolean hasXmlValue(String name, JsObject object) {
+        return object.values.stream().anyMatch(e -> ("#" + name).equals(e.name));
     }
 
     private XAttributes getXmlAttributes(JsObject object) {
@@ -105,12 +109,20 @@ public class JsConverter {
     private XValue getXmlValue(String name, JsObject object) {
         return object.values.stream()
                 .filter(e -> ("#" + name).equals(e.name))
-                .map(e -> e.value)
-                .filter(Objects::nonNull)
-                .filter(v -> !(v instanceof JsNull))
-                .map(Objects::toString)
-                .filter(s -> !s.isEmpty())
-                .map(XSimpleValue::new)
+                .limit(1)
+                .filter(e -> !(e.value instanceof JsNull))
+                .map(e -> {
+                    if (e.value.isSimple()) {
+                        return new XSimpleValue(e.value.toString());
+                    } else {
+                        final List<XElement> children = convert((JsObject) e.value);
+                        if (children.isEmpty()) {
+                            return new XSimpleValue();
+                        } else {
+                            return new XElements(children);
+                        }
+                    }
+                })
                 .findFirst()
                 .orElse(null);
     }
