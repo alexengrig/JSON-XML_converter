@@ -1,0 +1,12 @@
+type: code
+files:
+- name: src/Main.java
+  visible: true
+  text: "/**\n    This packer has too much freedom and could repackage stuff in wrong\
+    \ direction.\n    Fix method types in signature and add implementation. \n*/\n\
+    class Packer {\n\n\tpublic void repackage(Box to, Box from) {\n\t\t// Implement\
+    \ repackaging\n\t}\n\n}"
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/2640
+status: Solved
+record: -1

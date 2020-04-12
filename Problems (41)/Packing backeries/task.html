@@ -1,0 +1,28 @@
+<b>Packing backeries</b> <a class="right" href="https://hyperskill.org/learn/step/2640">Open on JetBrains Academy</a><br/><br/><html>
+ <head></head>
+ <body>
+  <p>You are working in a Pie company. The business going well and bakeries are selling abroad. Sometimes due to custom rules and trade regulations, it is necessary to package bakeries into the box with a more basic name like Bakery or Food. Full class hierarchy follows:</p> 
+  <pre><code class="language-java">class Food {}
+
+class Bakery extends Food {}
+
+class Cake extends Bakery {}
+
+class Pie extends Bakery {}
+
+class Tart extends Bakery {}
+
+interface Box&lt;T&gt; {
+&nbsp; &nbsp; public void put(T item);
+&nbsp; &nbsp; public T get();
+}</code></pre> 
+  <p>There is Packer class available, but it&nbsp;is designed with business rule violation and lacks implementation. Correct the Packer code to ensure that:</p> 
+  <ul> 
+   <li>Any kind of Bakery could be repacked to the Box with more basic type (e.g. from box with Pie to box with Food)</li> 
+   <li>Basic stuff like food can't be repacked into narrowly typed Box'es (e.g. with Cakes)</li> 
+   <li>Arbitrary stuff like Strings or Objects can't be repacked without compile-time errors or warnings</li> 
+   <li>Repacking actually happens</li> 
+  </ul> 
+  <p>If you cannot solve this task too much time, try to skip it.</p>
+ </body>
+</html><br><br><font color="gray">Memory limit: 256 MB</font><br><font color="gray">Time limit: 8 seconds</font><br><br><br/><a href="https://hyperskill.org/learn/step/9101">Show topic summary</a>
