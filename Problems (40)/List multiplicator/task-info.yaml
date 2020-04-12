@@ -1,0 +1,13 @@
+type: code
+files:
+- name: src/Main.java
+  visible: true
+  text: "/**\n    Class to modify\n*/\nclass ListMultiplicator {\n\n    /**\n    \
+    \    Multiplies original list provided numper of times\n\n        @param list\
+    \ list to multiply\n        @param n times to multiply, should be zero or greater\n\
+    \    */\n\tpublic static void multiply(List<?> list, int n) {\n\t\t// Add implementation\
+    \ here\n\t}\n\n}"
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/2641
+status: Solved
+record: -1
