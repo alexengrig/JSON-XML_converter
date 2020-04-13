@@ -1,0 +1,11 @@
+type: code
+files:
+- name: src/Main.java
+  visible: true
+  text: "/**\n * Class to work with\n */\nclass Multiplicator {\n\n\tpublic static\
+    \ <T extends Copy<T>> Folder<T>[] multiply(Folder<T> folder, int arraySize) {\n\
+    \t\t// Method to implement\n\t}\n\n}"
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/2603
+status: Solved
+record: -1
