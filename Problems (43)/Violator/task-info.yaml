@@ -1,0 +1,10 @@
+type: code
+files:
+- name: src/Main.java
+  visible: true
+  text: "/**\n * Class to work with\n */\nclass Violator {\n\n\tpublic static List<Box<?\
+    \ extends Bakery>> defraud() {\n\t\t// Add implementation here\n\t}\n\n}"
+  learner_created: false
+feedback_link: https://hyperskill.org/learn/step/4894
+status: Solved
+record: -1

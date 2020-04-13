@@ -1,0 +1,39 @@
+<b>Violator</b> <a class="right" href="https://hyperskill.org/learn/step/4894">Open on JetBrains Academy</a><br/><br/><html>
+ <head></head>
+ <body>
+  <p>You are asked to perform security audit in a company that bakes Bakery and different subclasses of it and sells it in a nice boxes. Before release to customer all boxes are checked with carefully designed NaiveQualityControl class. Numerous cases when something other than Bakery (e.g. Paper) was packed in Boxes and escaped the quality check happened recently.</p> 
+  <p>Short look at NaiveQualityControl leads to conclusion that it's quite easy to provide NaiveQualityControl with Box filled with Paper that will pass QC, and you task is to demonstrate this. Code of related classes follows:</p> 
+  <pre><code class="language-java">/* This class and its subclasses should pass quality check */
+class Bakery {}
+
+class Cake extends Bakery {}
+
+/* But this should not */
+class Paper {}
+
+/* These boxes are used to pack stuff */
+class Box&lt;T&gt; {
+&nbsp; &nbsp; void put(T item) { /* implementation omitted */ }
+&nbsp; &nbsp; T get() { /* implementation omitted */ }
+}
+
+/* This quality checker ensures that boxes for sale contain Bakery and anything else */
+class NaiveQualityControl {
+&nbsp; 
+&nbsp; public static boolean check(List&lt;Box&lt;? extends Bakery&gt;&gt; boxes) {
+&nbsp; &nbsp; /* Method signature guarantees that all illegal 
+       calls will produce compile-time error... or not? */  
+&nbsp; &nbsp; return true;  
+&nbsp; }
+&nbsp; 
+}</code></pre> 
+  <p>&nbsp;</p> 
+  <p>You need to add implementation to Violator.defraud() method that will do the following:</p> 
+  <ul> 
+   <li>﻿Create List of Boxes&lt;? extends Bakery&gt; according to method signature</li> 
+   <li>Put Paper object in at least one Box in the list</li> 
+   <li>The resulting list should pass NaiveQualityControl check</li> 
+  </ul> 
+  <p>You shouldn't change method signature or change code of any other classes, just add implementaiton to defraud method.</p>
+ </body>
+</html><br><br><font color="gray">Memory limit: 256 MB</font><br><font color="gray">Time limit: 8 seconds</font><br><br><br/><a href="https://hyperskill.org/learn/step/3560">Show topic summary</a>
