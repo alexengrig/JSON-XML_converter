@@ -16,6 +16,16 @@ public class JsObject extends JsValue {
     }
 
     @Override
+    public String toPretty() {
+        final StringJoiner joiner = new StringJoiner(", ");
+        for (JsEntity value : values) {
+            joiner.add(value.toPretty());
+        }
+        return String.format("{%s}", joiner);
+
+    }
+
+    @Override
     public String toString() {
         final StringJoiner joiner = new StringJoiner(", ");
         for (JsEntity value : values) {
