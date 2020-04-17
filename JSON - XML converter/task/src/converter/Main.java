@@ -25,7 +25,7 @@ public class Main {
             final XElement xml = parser.parse(input);
             final XConverter converter = new XConverter();
             final JsObject json = converter.convert(xml);
-            System.out.println(json);
+            System.out.println(json.toPretty());
         } else {
             throw new IllegalArgumentException("Unknown input type: " + input);
         }
