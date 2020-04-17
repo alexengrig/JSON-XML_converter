@@ -3,21 +3,31 @@ package converter;
 import converter.js.JsConverter;
 import converter.js.JsObject;
 import converter.js.JsParser;
+import converter.x.XConverter;
 import converter.x.XElement;
-import converter.x.XPrinter;
+import converter.x.XParser;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        final JsObject json = new JsParser().parse(getInputFromFile());
-        final List<XElement> xmlList = new JsConverter().convert(json);
-        final XPrinter printer = new XPrinter();
-        for (XElement element : xmlList) {
-            printer.print(element);
+        final String input = getInputFromFile();
+        if (isJson(input)) {
+            final JsParser parser = new JsParser();
+            final JsObject json = parser.parse(input);
+            final JsConverter converter = new JsConverter();
+            final XElement xml = converter.convert(json);
+            System.out.println(xml);
+        } else if (isXml(input)) {
+            final XParser parser = new XParser();
+            final XElement xml = parser.parse(input);
+            final XConverter converter = new XConverter();
+            final JsObject json = converter.convert(xml);
+            System.out.println(json);
+        } else {
+            throw new IllegalArgumentException("Unknown input type: " + input);
         }
     }
 
@@ -32,5 +42,13 @@ public class Main {
             }
             return builder.toString();
         }
+    }
+
+    private static boolean isJson(String input) {
+        return input.startsWith("{");
+    }
+
+    private static boolean isXml(String input) {
+        return input.startsWith("<");
     }
 }
