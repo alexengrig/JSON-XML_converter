@@ -4,11 +4,19 @@ import converter.x.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class JsConverter {
-    public List<XElement> convert(JsObject json) {
+    public XElement convert(JsObject json) {
+        final List<XElement> children = convertChildren(json);
+        if (children.size() == 1) {
+            return children.get(0);
+        } else {
+            return new XElement("root", new XElements(children));
+        }
+    }
+
+    private List<XElement> convertChildren(JsObject json) {
         final List<XElement> elements = new ArrayList<>();
         final List<JsEntity> entities = json.values;
         for (JsEntity entity : entities) {
@@ -49,7 +57,7 @@ public class JsConverter {
                         }
                     }
                 } else {
-                    final List<XElement> children = convert(object);
+                    final List<XElement> children = convertChildren(object);
                     if (children.isEmpty()) {
                         elements.add(new XElement(name, new XSimpleValue()));
                     } else {
@@ -115,7 +123,7 @@ public class JsConverter {
                     if (e.value.isSimple()) {
                         return new XSimpleValue(e.value.toString());
                     } else {
-                        final List<XElement> children = convert((JsObject) e.value);
+                        final List<XElement> children = convertChildren((JsObject) e.value);
                         if (children.isEmpty()) {
                             return new XSimpleValue();
                         } else {
