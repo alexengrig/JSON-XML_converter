@@ -1,10 +1,16 @@
+import com.google.gson.*;
 import converter.Main;
 import org.hyperskill.hstest.v6.stage.BaseStageTest;
 import org.hyperskill.hstest.v6.testcase.CheckResult;
 import org.hyperskill.hstest.v6.testcase.TestCase;
 
+import org.w3c.dom.*;
+
+import javax.xml.parsers.*;
+import java.io.*;
+
+import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 class Clue {
     String answer;
@@ -25,6 +31,57 @@ public class ConverterTest extends BaseStageTest<Clue> {
 
     static {
         allTests = new LinkedHashMap<>();
+
+        allTests.put(
+            "{\n" +
+                "    \"transaction\": {\n" +
+                "        \"id\": \"6753322\",\n" +
+                "        \"number\": {\n" +
+                "            \"@region\": \"Russia\",\n" +
+                "            \"#number\": \"8-900-000-00-00\"\n" +
+                "        },\n" +
+                "        \"amount\": null\n" +
+                "    }\n" +
+                "}",
+
+
+            "<transaction>\n" +
+                "    <id>6753322</id>\n" +
+                "    <number region=\"Russia\">8-900-000-00-00</number>\n" +
+                "    <amount />\n" +
+                "</transaction>"
+        );
+
+
+        allTests.put(
+            "{\n" +
+                "    \"transaction\": {\n" +
+                "        \"id\": \"6753322\",\n" +
+                "        \"number\": {\n" +
+                "            \"@region\": \"Russia\",\n" +
+                "            \"#number\": \"8-900-000-00-00\"\n" +
+                "        },\n" +
+                "        \"amount\": null\n" +
+                "    },\n" +
+                "    \"meta\": {\n" +
+                "        \"version\": 0.01\n" +
+                "    }\n" +
+                "}",
+
+
+            "<root>\n" +
+                "    <transaction>\n" +
+                "        <id>6753322</id>\n" +
+                "        <number region=\"Russia\">8-900-000-00-00</number>\n" +
+                "        <amount />\n" +
+                "    </transaction>\n" +
+                "    <meta>\n" +
+                "        <version>0.01</version>\n" +
+                "    </meta>\n" +
+                "</root>"
+        );
+
+
 
         allTests.put(
             "{\n" +
@@ -93,254 +150,280 @@ public class ConverterTest extends BaseStageTest<Clue> {
                 "}",
 
 
-            "Element:\n" +
-                "path = transaction\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, id\n" +
-                "value = \"6753322\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, number\n" +
-                "value = \"8-900-000-000\"\n" +
-                "attributes:\n" +
-                "region = \"Russia\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, empty1\n" +
-                "value = null\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, empty2\n" +
-                "value = \"\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, empty3\n" +
-                "value = \"\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner1\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner1, inner2\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner1, inner2, inner3\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner1, inner2, inner3, key1\n" +
-                "value = \"value1\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner1, inner2, inner3, key2\n" +
-                "value = \"value2\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner4\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner4, inner4\n" +
-                "value = \"value3\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner5\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner5, attr1\n" +
-                "value = \"123.456\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner5, inner4\n" +
-                "value = \"value4\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner6\n" +
-                "value = \"value5\"\n" +
-                "attributes:\n" +
-                "attr2 = \"789.321\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner7\n" +
-                "value = \"value6\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner8\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner8, attr3\n" +
-                "value = \"value7\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner9\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner9, attr4\n" +
-                "value = \"value8\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner9, inner9\n" +
-                "value = \"value9\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner9, something\n" +
-                "value = \"value10\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner10\n" +
-                "value = null\n" +
-                "attributes:\n" +
-                "attr5 = \"\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner11\n" +
-                "value = \"\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner12\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner12, somekey\n" +
-                "value = \"keyvalue\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner12, inner12\n" +
-                "value = \"notnull\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = meta\n" +
-                "\n" +
-                "Element:\n" +
-                "path = meta, version\n" +
-                "value = \"0.01\""
+            "<root>\n" +
+                "    <transaction>\n" +
+                "        <id>6753322</id>\n" +
+                "        <number region=\"Russia\">8-900-000-000</number>\n" +
+                "        <empty1 />\n" +
+                "        <empty2></empty2>\n" +
+                "        <empty3></empty3>\n" +
+                "        <inner1>\n" +
+                "            <inner2>\n" +
+                "                <inner3>\n" +
+                "                    <key1>value1</key1>\n" +
+                "                    <key2>value2</key2>\n" +
+                "                </inner3>\n" +
+                "            </inner2>\n" +
+                "        </inner1>\n" +
+                "        <inner4>\n" +
+                "            <inner4>value3</inner4>\n" +
+                "        </inner4>\n" +
+                "        <inner5>\n" +
+                "            <attr1>123.456</attr1>\n" +
+                "            <inner4>value4</inner4>\n" +
+                "        </inner5>\n" +
+                "        <inner6 attr2=\"789.321\">value5</inner6>\n" +
+                "        <inner7>value6</inner7>\n" +
+                "        <inner8>\n" +
+                "            <attr3>value7</attr3>\n" +
+                "        </inner8>\n" +
+                "        <inner9>\n" +
+                "            <attr4>value8</attr4>\n" +
+                "            <inner9>value9</inner9>\n" +
+                "            <something>value10</something>\n" +
+                "        </inner9>\n" +
+                "        <inner10 attr5=\"\" />\n" +
+                "        <inner11></inner11>\n" +
+                "        <inner12>\n" +
+                "            <somekey>keyvalue</somekey>\n" +
+                "            <inner12>notnull</inner12>\n" +
+                "        </inner12>\n" +
+                "    </transaction>\n" +
+                "    <meta>\n" +
+                "        <version>0.01</version>\n" +
+                "    </meta>\n" +
+                "</root>"
         );
+
+
+
+        allTests.put(
+            "<root>\n" +
+                "    <id>6753322</id>\n" +
+                "    <number region=\"Russia\">8-900-000-00-00</number>\n" +
+                "    <nonattr1 />\n" +
+                "    <nonattr2></nonattr2>\n" +
+                "    <nonattr3>text</nonattr3>\n" +
+                "    <attr1 id=\"1\" />\n" +
+                "    <attr2 id=\"2\"></attr2>\n" +
+                "    <attr3 id=\"3\">text</attr3>\n" +
+                "    <email>\n" +
+                "        <to>to_example@gmail.com</to>\n" +
+                "        <from>from_example@gmail.com</from>\n" +
+                "        <subject>Project discussion</subject>\n" +
+                "        <body font=\"Verdana\">Body message</body>\n" +
+                "        <date day=\"12\" month=\"12\" year=\"2018\"/>\n" +
+                "    </email>\n" +
+                "</root>",
+
+
+            "{\n" +
+                "    \"root\": {\n" +
+                "        \"id\": \"6753322\",\n" +
+                "        \"number\": {\n" +
+                "            \"@region\": \"Russia\",\n" +
+                "            \"#number\": \"8-900-000-00-00\"\n" +
+                "        },\n" +
+                "        \"nonattr1\": null,\n" +
+                "        \"nonattr2\": \"\",\n" +
+                "        \"nonattr3\": \"text\",\n" +
+                "        \"attr1\": {\n" +
+                "            \"@id\": \"1\",\n" +
+                "            \"#attr1\": null\n" +
+                "        },\n" +
+                "        \"attr2\": {\n" +
+                "            \"@id\": \"2\",\n" +
+                "            \"#attr2\": \"\"\n" +
+                "        },\n" +
+                "        \"attr3\": {\n" +
+                "            \"@id\": \"3\",\n" +
+                "            \"#attr3\": \"text\"\n" +
+                "        },\n" +
+                "        \"email\": {\n" +
+                "            \"to\": \"to_example@gmail.com\",\n" +
+                "            \"from\": \"from_example@gmail.com\",\n" +
+                "            \"subject\": \"Project discussion\",\n" +
+                "            \"body\": {\n" +
+                "                \"@font\": \"Verdana\",\n" +
+                "                \"#body\": \"Body message\"\n" +
+                "            },\n" +
+                "            \"date\": {\n" +
+                "                \"@day\": \"12\",\n" +
+                "                \"@month\": \"12\",\n" +
+                "                \"@year\": \"2018\",\n" +
+                "                \"#date\": null\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "}"
+        );
+
+
 
         allTests.put(
             "{\n" +
-                "    \"root1\": {\n" +
+                "    \"elem1\": {\n" +
                 "        \"@attr1\": \"val1\",\n" +
                 "        \"@attr2\": \"val2\",\n" +
-                "        \"#root1\": {\n" +
-                "            \"elem1\": {\n" +
+                "        \"#elem1\": {\n" +
+                "            \"elem2\": {\n" +
                 "                \"@attr3\": \"val3\",\n" +
                 "                \"@attr4\": \"val4\",\n" +
-                "                \"#elem1\": \"Value1\"\n" +
+                "                \"#elem2\": \"Value1\"\n" +
                 "            },\n" +
-                "            \"elem2\": {\n" +
+                "            \"elem3\": {\n" +
                 "                \"@attr5\": \"val5\",\n" +
                 "                \"@attr6\": \"val6\",\n" +
-                "                \"#elem2\": \"Value2\"\n" +
+                "                \"#elem3\": \"Value2\"\n" +
                 "            }\n" +
                 "        }\n" +
-                "    },\n" +
-                "    \"root2\": {\n" +
-                "        \"@attr1\": null,\n" +
-                "        \"@attr2\": \"\",\n" +
-                "        \"#root2\": null\n" +
-                "    },\n" +
-                "    \"root3\": {\n" +
-                "        \"@attr1\": \"val2\",\n" +
-                "        \"@attr2\": \"val1\",\n" +
-                "        \"#root3\": \"\"\n" +
-                "    },\n" +
-                "    \"root4\": \"Value4\"\n" +
+                "    }\n" +
                 "}",
 
-            "Element:\n" +
-                "path = root1\n" +
-                "attributes:\n" +
-                "attr1 = \"val1\"\n" +
-                "attr2 = \"val2\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = root1, elem1\n" +
-                "value = \"Value1\"\n" +
-                "attributes:\n" +
-                "attr3 = \"val3\"\n" +
-                "attr4 = \"val4\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = root1, elem2\n" +
-                "value = \"Value2\"\n" +
-                "attributes:\n" +
-                "attr5 = \"val5\"\n" +
-                "attr6 = \"val6\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = root2\n" +
-                "value = null\n" +
-                "attributes:\n" +
-                "attr1 = \"\"\n" +
-                "attr2 = \"\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = root3\n" +
-                "value = \"\"\n" +
-                "attributes:\n" +
-                "attr1 = \"val2\"\n" +
-                "attr2 = \"val1\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = root4\n" +
-                "value = \"Value4\""
+
+            "<elem1 attr1=\"val1\" attr2=\"val2\">\n" +
+                "    <elem2 attr3=\"val3\" attr4=\"val4\">Value1</elem2>\n" +
+                "    <elem3 attr5=\"val5\" attr6=\"val6\">Value2</elem3>\n" +
+                "</elem1>"
         );
 
-        allTests.put("{\"root1\":{\"@attr1\":\"val1\"," +
-            "\"@attr2\":\"val2\",\"#root1\":{\"elem1\":{\"" +
-            "@attr3\":\"val3\",\"@attr4\":\"val4\",\"#ele" +
-            "m1\":\"Value1\"},\"elem2\":{\"@attr5\":\"val" +
-            "5\",\"@attr6\":\"val6\",\"#elem2\":\"Value2\"" +
-            "}}},\"root2\":{\"@attr1\":null,\"@attr2\":\"" +
-            "\",\"#root2\":null},\"root3\":{\"@attr1\":\"" +
-            "val2\",\"@attr2\":\"val1\",\"#root3\":\"\"}," +
-            "\"root4\":\"Value4\"}",
 
 
-            "Element:\n" +
-                "path = root1\n" +
-                "attributes:\n" +
-                "attr1 = \"val1\"\n" +
-                "attr2 = \"val2\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = root1, elem1\n" +
-                "value = \"Value1\"\n" +
-                "attributes:\n" +
-                "attr3 = \"val3\"\n" +
-                "attr4 = \"val4\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = root1, elem2\n" +
-                "value = \"Value2\"\n" +
-                "attributes:\n" +
-                "attr5 = \"val5\"\n" +
-                "attr6 = \"val6\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = root2\n" +
-                "value = null\n" +
-                "attributes:\n" +
-                "attr1 = \"\"\n" +
-                "attr2 = \"\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = root3\n" +
-                "value = \"\"\n" +
-                "attributes:\n" +
-                "attr1 = \"val2\"\n" +
-                "attr2 = \"val1\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = root4\n" +
-                "value = \"Value4\""
+        allTests.put(
+            "<elem1 attr1=\"val1\" attr2=\"val2\">\n" +
+                "    <elem2 attr3=\"val3\" attr4=\"val4\">Value1</elem2>\n" +
+                "    <elem3 attr5=\"val5\" attr6=\"val6\">Value2</elem3>\n" +
+                "</elem1>",
+
+
+            "{\n" +
+                "    \"elem1\": {\n" +
+                "        \"@attr1\": \"val1\",\n" +
+                "        \"@attr2\": \"val2\",\n" +
+                "        \"#elem1\": {\n" +
+                "            \"elem2\": {\n" +
+                "                \"@attr3\": \"val3\",\n" +
+                "                \"@attr4\": \"val4\",\n" +
+                "                \"#elem2\": \"Value1\"\n" +
+                "            },\n" +
+                "            \"elem3\": {\n" +
+                "                \"@attr5\": \"val5\",\n" +
+                "                \"@attr6\": \"val6\",\n" +
+                "                \"#elem3\": \"Value2\"\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "}"
         );
+
+
+        allTests.put(
+            "{\"transaction\":{\"id\":\"6753322\",\"number\":{\"@region\":\"Russia\",\"#number\":\"8-900-000-000\"},\"empty1\":null,\"empty2\":{},\"empty3\":\"\",\"inner1\":{\"inner2\":{\"inner3\":{\"key1\":\"value1\",\"key2\":\"value2\"}}},\"inner4\":{\"@\":123,\"#inner4\":\"value3\"},\"inner5\":{\"@attr1\":123.456,\"#inner4\":\"value4\"},\"inner6\":{\"@attr2\":789.321,\"#inner6\":\"value5\"},\"inner7\":{\"#inner7\":\"value6\"},\"inner8\":{\"@attr3\":\"value7\"},\"inner9\":{\"@attr4\":\"value8\",\"#inner9\":\"value9\",\"something\":\"value10\"},\"inner10\":{\"@attr5\":null,\"#inner10\":null},\"inner11\":{\"@\":null,\"#\":null},\"inner12\":{\"@somekey\":\"attrvalue\",\"#inner12\":null,\"somekey\":\"keyvalue\",\"inner12\":\"notnull\"},\"\":{\"#\":null,\"secret\":\"this won't be converted\"}},\"meta\":{\"version\":0.01}}",
+
+
+            "<root>\n" +
+                "    <transaction>\n" +
+                "        <id>6753322</id>\n" +
+                "        <number region=\"Russia\">8-900-000-000</number>\n" +
+                "        <empty1 />\n" +
+                "        <empty2></empty2>\n" +
+                "        <empty3></empty3>\n" +
+                "        <inner1>\n" +
+                "            <inner2>\n" +
+                "                <inner3>\n" +
+                "                    <key1>value1</key1>\n" +
+                "                    <key2>value2</key2>\n" +
+                "                </inner3>\n" +
+                "            </inner2>\n" +
+                "        </inner1>\n" +
+                "        <inner4>\n" +
+                "            <inner4>value3</inner4>\n" +
+                "        </inner4>\n" +
+                "        <inner5>\n" +
+                "            <attr1>123.456</attr1>\n" +
+                "            <inner4>value4</inner4>\n" +
+                "        </inner5>\n" +
+                "        <inner6 attr2=\"789.321\">value5</inner6>\n" +
+                "        <inner7>value6</inner7>\n" +
+                "        <inner8>\n" +
+                "            <attr3>value7</attr3>\n" +
+                "        </inner8>\n" +
+                "        <inner9>\n" +
+                "            <attr4>value8</attr4>\n" +
+                "            <inner9>value9</inner9>\n" +
+                "            <something>value10</something>\n" +
+                "        </inner9>\n" +
+                "        <inner10 attr5=\"\" />\n" +
+                "        <inner11></inner11>\n" +
+                "        <inner12>\n" +
+                "            <somekey>keyvalue</somekey>\n" +
+                "            <inner12>notnull</inner12>\n" +
+                "        </inner12>\n" +
+                "    </transaction>\n" +
+                "    <meta>\n" +
+                "        <version>0.01</version>\n" +
+                "    </meta>\n" +
+                "</root>"
+        );
+
+
+        allTests.put(
+            "<root><id>6753322</id><number region=\"Russia\">8-900-000-00-00</number><nonattr1 /><nonattr2></nonattr2><nonattr3>text</nonattr3><attr1 id=\"1\" /><attr2 id=\"2\"></attr2><attr3 id=\"3\">text</attr3><email><to>to_example@gmail.com</to><from>from_example@gmail.com</from><subject>Project discussion</subject><body font=\"Verdana\">Body message</body><date day=\"12\" month=\"12\" year=\"2018\"/></email></root>",
+
+
+            "{\n" +
+                "    \"root\": {\n" +
+                "        \"id\": \"6753322\",\n" +
+                "        \"number\": {\n" +
+                "            \"@region\": \"Russia\",\n" +
+                "            \"#number\": \"8-900-000-00-00\"\n" +
+                "        },\n" +
+                "        \"nonattr1\": null,\n" +
+                "        \"nonattr2\": \"\",\n" +
+                "        \"nonattr3\": \"text\",\n" +
+                "        \"attr1\": {\n" +
+                "            \"@id\": \"1\",\n" +
+                "            \"#attr1\": null\n" +
+                "        },\n" +
+                "        \"attr2\": {\n" +
+                "            \"@id\": \"2\",\n" +
+                "            \"#attr2\": \"\"\n" +
+                "        },\n" +
+                "        \"attr3\": {\n" +
+                "            \"@id\": \"3\",\n" +
+                "            \"#attr3\": \"text\"\n" +
+                "        },\n" +
+                "        \"email\": {\n" +
+                "            \"to\": \"to_example@gmail.com\",\n" +
+                "            \"from\": \"from_example@gmail.com\",\n" +
+                "            \"subject\": \"Project discussion\",\n" +
+                "            \"body\": {\n" +
+                "                \"@font\": \"Verdana\",\n" +
+                "                \"#body\": \"Body message\"\n" +
+                "            },\n" +
+                "            \"date\": {\n" +
+                "                \"@day\": \"12\",\n" +
+                "                \"@month\": \"12\",\n" +
+                "                \"@year\": \"2018\",\n" +
+                "                \"#date\": null\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "}"
+        );
+
+
+
+
+
 
         allTests.put(
             "{\n" +
                 "    \"transaction\": {\n" +
-                "        \"id\": \"13243547\",\n" +
+                "        \"id\": \"6753333\",\n" +
                 "        \"number\": {\n" +
-                "            \"@region\": \"USA\",\n" +
-                "            \"#number\": \"8-900-000-999\"\n" +
+                "            \"@region\": \"Russia\",\n" +
+                "            \"#number\": \"8-900-777-000\"\n" +
                 "        },\n" +
                 "        \"inner1\": {\n" +
                 "            \"inner2\": {\n" +
@@ -398,114 +481,105 @@ public class ConverterTest extends BaseStageTest<Clue> {
                 "}",
 
 
-            "Element:\n" +
-                "path = transaction\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, id\n" +
-                "value = \"13243547\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, number\n" +
-                "value = \"8-900-000-999\"\n" +
-                "attributes:\n" +
-                "region = \"USA\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner1\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner1, inner2\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner1, inner2, inner3\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner1, inner2, inner3, key1\n" +
-                "value = \"value1\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner1, inner2, inner3, key2\n" +
-                "value = \"value2\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner4\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner4, inner4\n" +
-                "value = \"value3\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner5\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner5, attr1\n" +
-                "value = \"123.456\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner5, inner4\n" +
-                "value = \"value4\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner6\n" +
-                "value = \"value5\"\n" +
-                "attributes:\n" +
-                "attr2 = \"789.321\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner7\n" +
-                "value = \"value6\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner8\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner8, attr3\n" +
-                "value = \"value7\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner9\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner9, attr4\n" +
-                "value = \"value8\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner9, inner9\n" +
-                "value = \"value9\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner9, something\n" +
-                "value = \"value10\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner10\n" +
-                "value = null\n" +
-                "attributes:\n" +
-                "attr5 = \"\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner11\n" +
-                "value = \"\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner12\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner12, somekey\n" +
-                "value = \"keyvalue\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = transaction, inner12, inner12\n" +
-                "value = \"notnull\"\n" +
-                "\n" +
-                "Element:\n" +
-                "path = meta\n" +
-                "\n" +
-                "Element:\n" +
-                "path = meta, version\n" +
-                "value = \"0.01\""
+            "<root>\n" +
+                "    <transaction>\n" +
+                "        <id>6753333</id>\n" +
+                "        <number region=\"Russia\">8-900-777-000</number>\n" +
+                "        <inner1>\n" +
+                "            <inner2>\n" +
+                "                <inner3>\n" +
+                "                    <key1>value1</key1>\n" +
+                "                    <key2>value2</key2>\n" +
+                "                </inner3>\n" +
+                "            </inner2>\n" +
+                "        </inner1>\n" +
+                "        <inner4>\n" +
+                "            <inner4>value3</inner4>\n" +
+                "        </inner4>\n" +
+                "        <inner5>\n" +
+                "            <attr1>123.456</attr1>\n" +
+                "            <inner4>value4</inner4>\n" +
+                "        </inner5>\n" +
+                "        <inner6 attr2=\"789.321\">value5</inner6>\n" +
+                "        <inner7>value6</inner7>\n" +
+                "        <inner8>\n" +
+                "            <attr3>value7</attr3>\n" +
+                "        </inner8>\n" +
+                "        <inner9>\n" +
+                "            <attr4>value8</attr4>\n" +
+                "            <inner9>value9</inner9>\n" +
+                "            <something>value10</something>\n" +
+                "        </inner9>\n" +
+                "        <inner10 attr5=\"\" />\n" +
+                "        <inner11></inner11>\n" +
+                "        <inner12>\n" +
+                "            <somekey>keyvalue</somekey>\n" +
+                "            <inner12>notnull</inner12>\n" +
+                "        </inner12>\n" +
+                "    </transaction>\n" +
+                "    <meta>\n" +
+                "        <version>0.01</version>\n" +
+                "    </meta>\n" +
+                "</root>"
         );
+
+
+
+        allTests.put(
+            "<root>\n" +
+                "    <id>6753333</id>\n" +
+                "    <number region=\"Russia\">8-900-888-00-00</number>\n" +
+                "    <attr1 id=\"1\" />\n" +
+                "    <attr2 id=\"2\"></attr2>\n" +
+                "    <attr3 id=\"3\">text</attr3>\n" +
+                "    <email>\n" +
+                "        <to>to_example@gmail.com</to>\n" +
+                "        <from>from_example@gmail.com</from>\n" +
+                "        <subject>Project discussion</subject>\n" +
+                "        <body font=\"Verdana\">Body message</body>\n" +
+                "        <date day=\"12\" month=\"12\" year=\"2018\"/>\n" +
+                "    </email>\n" +
+                "</root>",
+
+
+            "{\n" +
+                "    \"root\": {\n" +
+                "        \"id\": \"6753333\",\n" +
+                "        \"number\": {\n" +
+                "            \"@region\": \"Russia\",\n" +
+                "            \"#number\": \"8-900-888-00-00\"\n" +
+                "        },\n" +
+                "        \"attr1\": {\n" +
+                "            \"@id\": \"1\",\n" +
+                "            \"#attr1\": null\n" +
+                "        },\n" +
+                "        \"attr2\": {\n" +
+                "            \"@id\": \"2\",\n" +
+                "            \"#attr2\": \"\"\n" +
+                "        },\n" +
+                "        \"attr3\": {\n" +
+                "            \"@id\": \"3\",\n" +
+                "            \"#attr3\": \"text\"\n" +
+                "        },\n" +
+                "        \"email\": {\n" +
+                "            \"to\": \"to_example@gmail.com\",\n" +
+                "            \"from\": \"from_example@gmail.com\",\n" +
+                "            \"subject\": \"Project discussion\",\n" +
+                "            \"body\": {\n" +
+                "                \"@font\": \"Verdana\",\n" +
+                "                \"#body\": \"Body message\"\n" +
+                "            },\n" +
+                "            \"date\": {\n" +
+                "                \"@day\": \"12\",\n" +
+                "                \"@month\": \"12\",\n" +
+                "                \"@year\": \"2018\",\n" +
+                "                \"#date\": null\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "}"
+        );
+
     }
 
     @Override
@@ -532,63 +606,302 @@ public class ConverterTest extends BaseStageTest<Clue> {
         String user = reply.strip();
         String answer = clue.answer.strip();
 
-        List<String> userLines = user
-            .lines()
-            .map(String::strip)
-            .map(e -> e.replaceAll("\\s+", " "))
-            .filter(e -> e.length() > 0)
-            .collect(Collectors.toList());
+        if (user.length() == 0) {
+            return new CheckResult(false,
+                "Your output is empty line.");
+        }
 
-        List<String> answerLines = answer
-            .lines()
-            .map(String::strip)
-            .map(e -> e.replaceAll("\\s+", " "))
-            .filter(e -> e.length() > 0)
-            .collect(Collectors.toList());
+        CheckResult result;
 
-        if (userLines.size() < answerLines.size()) {
+        if (user.charAt(0) != '<' && user.charAt(0) != '{') {
+            return new CheckResult(false,
+                "Your first symbol is wrong - " +
+                    " should be '{' or '<'");
+        }
 
-            LinkedHashSet<String> answerSet = new LinkedHashSet<>();
-            answerSet.addAll(answerLines);
-            for (String line : userLines) {
-                answerSet.remove(line);
-            }
-            if (!answerSet.isEmpty()) {
-                String notFoundLine = answerSet.stream().findFirst().get();
+        try {
+            if (user.charAt(0) == '<' && answer.charAt(0) == '<') {
+                result = isEqualXMLs(user, answer);
+            } else if (user.charAt(0) == '{' && answer.charAt(0) == '{') {
+                result = isEqualJSONs(user, answer);
+            } else {
                 return new CheckResult(false,
-                    "The following line is not found in output:\n" + notFoundLine);
+                    "Your first symbol is wrong - " +
+                        "'{' instead of '<' or vice versa" + "\n\n" + user + "\n\n" + answer);
             }
-            return new CheckResult(false);
+        } catch (Exception ex) {
+            return new CheckResult(false,
+                "Can't check the output - invalid XML or JSON");
+        }
 
-        } else if (userLines.size() > answerLines.size()) {
+        return result;
+    }
 
-            LinkedHashSet<String> userSet = new LinkedHashSet<>();
-            userSet.addAll(answerLines);
-            for (String line : answerLines) {
-                userSet.remove(line);
-            }
-            if (!userSet.isEmpty()) {
-                String excessLine = userSet.stream().findFirst().get();
-                return new CheckResult(false,
-                    "The following line is not needed in output:\n" + excessLine);
-            }
-            return new CheckResult(false);
+    public static Element stringToXML(String str) throws Exception {
+        DocumentBuilderFactory factory =
+            DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
 
+        ByteArrayInputStream input = new ByteArrayInputStream(
+            str.getBytes("UTF-8"));
+
+        Document document = builder.parse(input);
+
+        return document.getDocumentElement();
+    }
+
+
+    public static CheckResult isEqualXMLs(String s1, String s2) throws Exception {
+        Element elem1 = stringToXML(s1);
+        Element elem2 = stringToXML(s2);
+
+        CheckResult result = isEqualXMLElements(elem1, elem2);
+
+        if (!result.isCorrect()) {
+            return result;
         } else {
-
-            for (int i = 0; i < userLines.size(); i++) {
-
-                String userLine = userLines.get(i);
-                String answerLine = answerLines.get(i);
-
-                if (!userLine.equals(answerLine)) {
-                    return new CheckResult(false,
-                        "The following line was expected:\n" + answerLine + "\n" +
-                            "The following line was given:\n" + userLine);
-                }
-            }
-
-            return CheckResult.TRUE;
+            return isEqualXMLElements(elem2, elem1);
         }
     }
+
+    public static CheckResult isEqualXMLElements(Element e1, Element e2) {
+        // test name
+        if (!e1.getNodeName().equals(e2.getNodeName())) {
+            return new CheckResult(false,
+                "In XML: element name is incorrect");
+        }
+
+        // test attributes
+        NamedNodeMap attributes = e1.getAttributes();
+        for (int i = 0; i < attributes.getLength(); i++) {
+            Attr attr = (Attr) attributes.item(i);
+
+            String name = attr.getName();
+
+            if (!e2.hasAttribute(name)) {
+                return new CheckResult(false,
+                    "In XML: element doesn't have " +
+                        "an attribute or has an excess attribute");
+            }
+
+            if (!attr.getValue().equals(e2.getAttribute(name))) {
+                return new CheckResult(false,
+                    "In XML: element has an attribute " +
+                        "but their values don't match");
+            }
+        }
+
+        // test chidls
+        if (e1.hasChildNodes() != e2.hasChildNodes()) {
+            return new CheckResult(false,
+                "In XML: element doesn't have needed " +
+                    "child nodes or has excess child nodes");
+        }
+
+        if (!e1.hasChildNodes()) {
+            return CheckResult.TRUE;
+        }
+
+        NodeList childs1 = e1.getChildNodes();
+        NodeList childs2 = e2.getChildNodes();
+
+        List<Element> filteredChilds1 = new ArrayList<>();
+        List<Element> filteredChilds2 = new ArrayList<>();
+
+        for (int i = 0; i < childs1.getLength(); i++) {
+            Object item = childs1.item(i);
+            if (item instanceof Element) {
+                filteredChilds1.add((Element) childs1.item(i));
+            }
+        }
+
+        for (int i = 0; i < childs2.getLength(); i++) {
+            Object item = childs2.item(i);
+            if (item instanceof Element) {
+                filteredChilds2.add((Element) childs2.item(i));
+            }
+        }
+
+        if (filteredChilds1.size() != filteredChilds2.size()) {
+            return new CheckResult(false,
+                "In XML: element doesn't have needed " +
+                    "child nodes or has excess child nodes");
+        }
+
+        for (int i = 0; i < filteredChilds1.size(); i++) {
+
+            Element elem1 = filteredChilds1.get(i);
+            Element elem2 = filteredChilds2.get(i);
+
+            CheckResult result = isEqualXMLElements(elem1, elem2);
+            if (!result.isCorrect()) {
+                return result;
+            }
+        }
+
+        return CheckResult.TRUE;
+    }
+
+    public static JsonElement stringToJSON(String str) {
+        return new JsonParser().parse(str);
+    }
+
+
+    public static CheckResult isEqualJSONs(String s1, String s2) {
+        JsonElement elem1 = stringToJSON(s1);
+        JsonElement elem2 = stringToJSON(s2);
+
+        CheckResult result = isEqualJSONElements(elem1, elem2);
+
+        if (!result.isCorrect()) {
+            return result;
+        } else {
+            return isEqualJSONElements(elem2, elem1);
+        }
+    }
+
+    public static CheckResult isEqualJSONElements(JsonElement e1, JsonElement e2) {
+
+        // check for null
+        if (e1.isJsonNull() != e2.isJsonNull()) {
+            return new CheckResult(false,
+                "In JSON: expected null but found something else " +
+                    "(or vice versa)");
+        }
+        if (e1.isJsonNull()) {
+            return CheckResult.TRUE;
+        }
+
+
+        // check for primitives
+        if (e1.isJsonPrimitive() != e2.isJsonPrimitive()) {
+            // number and boolean are also may be expected but
+            // after converting from XML there can be only strings
+            return new CheckResult(false,
+                "In JSON: expected string " +
+                    "but found something else (or vice versa)");
+        }
+        if (e1.isJsonPrimitive()) {
+            JsonPrimitive prim1 = e1.getAsJsonPrimitive();
+            JsonPrimitive prim2 = e2.getAsJsonPrimitive();
+            return compareJSONPrimitives(prim1, prim2);
+        }
+
+
+        // check for arrays
+        if (e1.isJsonArray() != e2.isJsonArray()) {
+            return new CheckResult(false,
+                "In JSON: expected array " +
+                    "but found something else (or vice versa)");
+        }
+        if (e1.isJsonArray()) {
+            JsonArray arr1 = e1.getAsJsonArray();
+            JsonArray arr2 = e2.getAsJsonArray();
+            return compareJSONArrays(arr1, arr2);
+        }
+
+
+        // check for objects
+        if (e1.isJsonObject() != e2.isJsonObject()) {
+            return new CheckResult(false,
+                "In JSON: expected object " +
+                    "but found something else (or vice versa)");
+        }
+        if (e1.isJsonObject()) {
+            JsonObject obj1 = e1.getAsJsonObject();
+            JsonObject obj2 = e2.getAsJsonObject();
+            return compareJSONObjects(obj1, obj2);
+        }
+
+        return CheckResult.TRUE;
+    }
+
+
+    public static CheckResult compareJSONPrimitives(JsonPrimitive prim1,
+                                                    JsonPrimitive prim2) {
+
+        if (prim1.isBoolean() && prim2.isBoolean()) {
+            return new CheckResult(
+                prim1.getAsBoolean() == prim2.getAsBoolean(),
+                "In JSON: two boolean values don't match");
+        }
+        if (prim1.isNumber() && prim2.isNumber()) {
+            BigDecimal num1 = prim1.getAsBigDecimal();
+            BigDecimal num2 = prim2.getAsBigDecimal();
+            return new CheckResult(num1.equals(num2),
+                "In JSON: two number values don't match");
+        }
+        if (prim1.isString() && prim2.isString()) {
+            String num1 = prim1.getAsString();
+            String num2 = prim2.getAsString();
+            return new CheckResult(num1.equals(num2),
+                "In JSON: two string values don't match");
+        }
+
+
+        if (prim1.isString() && prim2.isNumber() ||
+            prim1.isNumber() && prim2.isString()) {
+
+            return new CheckResult(false,
+                "In JSON: expected string value but " +
+                    "found number (or vice versa)");
+        }
+        if (prim1.isString() && prim2.isBoolean() ||
+            prim1.isBoolean() && prim2.isString()) {
+
+            return new CheckResult(false,
+                "In JSON: expected string value but " +
+                    "found boolean (or vice versa)");
+        }
+        if (prim1.isNumber() && prim2.isBoolean() ||
+            prim1.isBoolean() && prim2.isNumber()) {
+
+            return new CheckResult(false,
+                "In JSON: expected number value but " +
+                    "found boolean (or vice versa)");
+        }
+
+        return CheckResult.TRUE;
+    }
+
+    public static CheckResult compareJSONArrays(JsonArray arr1, JsonArray arr2) {
+        if (arr1.size() != arr2.size()) {
+            return new CheckResult(false,
+                "In JSON: array size is incorrect");
+        }
+
+        for (int i = 0; i < arr1.size(); i++) {
+            JsonElement elem1 = arr1.get(i);
+            JsonElement elem2 = arr2.get(i);
+
+            CheckResult result = isEqualJSONElements(elem1, elem2);
+            if (!result.isCorrect()) {
+                return result;
+            }
+        }
+
+        return CheckResult.TRUE;
+    }
+
+    public static CheckResult compareJSONObjects(JsonObject obj1, JsonObject obj2) {
+
+        for (String key : obj1.keySet()) {
+            if (!obj2.has(key)) {
+                return new CheckResult(false,
+                    "In JSON: object doesn't have " +
+                        "needed key or has an excess key");
+            }
+
+            JsonElement value1 = obj1.get(key);
+            JsonElement value2 = obj2.get(key);
+
+            CheckResult result = isEqualJSONElements(value1, value2);
+            if (!result.isCorrect()) {
+                return result;
+            }
+        }
+
+        return CheckResult.TRUE;
+    }
+
 }
