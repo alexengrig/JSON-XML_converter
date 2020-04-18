@@ -7,19 +7,25 @@ import java.util.List;
 
 public class XConverter {
     public JsObject convert(XElement xml) {
-        final ArrayList<JsEntity> values = new ArrayList<>();
+        final List<JsEntity> entities = new ArrayList<>();
         if (xml.value instanceof XSimpleValue) {
-            values.add(new JsEntity(xml.name, convertValue(xml)));
+            entities.add(new JsEntity(xml.name, convertValue(xml)));
         } else if (xml.value instanceof XElement) {
             final XElement element = (XElement) xml.value;
-            values.add(new JsEntity(element.name, convertValue(element)));
+            entities.add(new JsEntity(element.name, convertValue(element)));
         } else if (xml.value instanceof XElements) {
             final XElements elements = (XElements) xml.value;
             for (XElement element : elements.values) {
-                values.add(new JsEntity(element.name, convertValue(element)));
+                entities.add(new JsEntity(element.name, convertValue(element)));
             }
         }
-        return new JsObject(new JsEntity(xml.name, new JsObject(values)));
+        if (xml.attributes == null) {
+            return new JsObject(new JsEntity(xml.name, new JsObject(entities)));
+        }
+        final List<JsEntity> attributes = convertAttributes(xml.attributes);
+        final List<JsEntity> target = new ArrayList<>(attributes);
+        target.add(new JsEntity("#" + xml.name, new JsObject(entities)));
+        return new JsObject(new JsEntity(xml.name, new JsObject(target)));
     }
 
     private List<JsEntity> convertAttributes(XAttributes attributes) {
