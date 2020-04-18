@@ -8,9 +8,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Json2XmlConverter implements Converter<JsonObject, XmlElement> {
-    private static final String ROOT_TAG = "root";
-    private static final String ATTRIBUTE_PREFIX = "@";
-    private static final String VALUE_PREFIX = "#";
+    private static final String ROOT = "root";
+    private static final String ELEMENT = "element";
+    private static final String ATTRIBUTE = "@";
+    private static final String VALUE = "#";
 
     @Override
     public XmlElement convert(JsonObject json) {
@@ -18,7 +19,7 @@ public class Json2XmlConverter implements Converter<JsonObject, XmlElement> {
         if (children.size() == 1) {
             return children.get(0);
         } else {
-            return new XmlElement(ROOT_TAG, new XmlElements(children));
+            return new XmlElement(ROOT, new XmlElements(children));
         }
     }
 
@@ -26,11 +27,9 @@ public class Json2XmlConverter implements Converter<JsonObject, XmlElement> {
         final List<XmlElement> elements = new ArrayList<>();
         final List<JsonEntity> entities = json.values;
         for (JsonEntity entity : entities) {
-            if ("".equals(entity.name) || ATTRIBUTE_PREFIX.equals(entity.name) || VALUE_PREFIX.equals(entity.name)) {
-                continue;
-            }
+            if ("".equals(entity.name) || ATTRIBUTE.equals(entity.name) || VALUE.equals(entity.name)) continue;
             final String name;
-            if (entity.name.startsWith(ATTRIBUTE_PREFIX) || entity.name.startsWith(VALUE_PREFIX)) {
+            if (entity.name.startsWith(ATTRIBUTE) || entity.name.startsWith(VALUE)) {
                 name = entity.name.substring(1);
                 if (entities.stream().map(e -> e.name).anyMatch(name::equals)) continue;
             } else {
@@ -75,6 +74,11 @@ public class Json2XmlConverter implements Converter<JsonObject, XmlElement> {
                 }
             } else if (value instanceof JsonArray) {
                 final JsonArray array = (JsonArray) value;
+                final List<XmlElement> values = new ArrayList<>();
+                for (JsonValue item : array.values) {
+                    values.add(new XmlElement(ELEMENT));
+                }
+                elements.add(new XmlElement(name, new XmlElements(values)));
             } else {
                 throw new UnsupportedOperationException("Unsupported JSON value type: " + value);
             }
@@ -86,29 +90,29 @@ public class Json2XmlConverter implements Converter<JsonObject, XmlElement> {
         final boolean isValid = object.values
                 .stream()
                 .allMatch(o -> o.name.length() > 1
-                        && ((o.name.startsWith(ATTRIBUTE_PREFIX) && o.value.isSimple()) || o.name.startsWith(VALUE_PREFIX)));
+                        && ((o.name.startsWith(ATTRIBUTE) && o.value.isSimple()) || o.name.startsWith(VALUE)));
         if (!isValid) {
             return false;
         }
         final List<String> values = object.values
                 .stream()
                 .map(e -> e.name)
-                .filter(s -> s.startsWith(VALUE_PREFIX))
+                .filter(s -> s.startsWith(VALUE))
                 .collect(Collectors.toList());
-        return values.size() == 1 && (VALUE_PREFIX + name).equals(values.get(0));
+        return values.size() == 1 && (VALUE + name).equals(values.get(0));
     }
 
     private boolean hasXmlAttributes(JsonObject object) {
-        return object.values.stream().map(e -> e.name).anyMatch(n -> n.startsWith(ATTRIBUTE_PREFIX) && n.length() > 1);
+        return object.values.stream().map(e -> e.name).anyMatch(n -> n.startsWith(ATTRIBUTE) && n.length() > 1);
     }
 
     private boolean hasXmlValue(String name, JsonObject object) {
-        return object.values.stream().anyMatch(e -> (VALUE_PREFIX + name).equals(e.name));
+        return object.values.stream().anyMatch(e -> (VALUE + name).equals(e.name));
     }
 
     private XmlAttributes getXmlAttributes(JsonObject object) {
         return new XmlAttributes(object.values.stream()
-                .filter(e -> e.name.startsWith(ATTRIBUTE_PREFIX) && e.name.length() > 1)
+                .filter(e -> e.name.startsWith(ATTRIBUTE) && e.name.length() > 1)
                 .map(this::getXmlAttribute)
                 .collect(Collectors.toList()));
     }
@@ -126,7 +130,7 @@ public class Json2XmlConverter implements Converter<JsonObject, XmlElement> {
 
     private XmlValue getXmlValue(String name, JsonObject object) {
         return object.values.stream()
-                .filter(e -> (VALUE_PREFIX + name).equals(e.name))
+                .filter(e -> (VALUE + name).equals(e.name))
                 .limit(1)
                 .filter(e -> !(e.value instanceof JsonNull))
                 .map(e -> {
