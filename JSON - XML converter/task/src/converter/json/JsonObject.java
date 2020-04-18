@@ -4,19 +4,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class JsObject extends JsValue {
-    protected final List<JsEntity> values;
+public class JsonObject extends JsonValue {
+    protected final List<JsonEntity> values;
 
-    public JsObject(List<JsEntity> values) {
+    public JsonObject(List<JsonEntity> values) {
         this.values = values;
     }
 
-    public JsObject(JsEntity entity) {
+    public JsonObject(JsonEntity entity) {
         this(Collections.singletonList(entity));
     }
 
-    public JsObject(String name, JsObject value) {
-        this(new JsEntity(name, value));
+    public JsonObject(String name, JsonObject value) {
+        this(new JsonEntity(name, value));
     }
 
     @Override
@@ -27,7 +27,7 @@ public class JsObject extends JsValue {
     @Override
     public String toPretty() {
         final StringJoiner joiner = new StringJoiner(", ");
-        for (JsEntity value : values) {
+        for (JsonEntity value : values) {
             joiner.add(value.toPretty());
         }
         return String.format("{%s}", joiner);
@@ -37,7 +37,7 @@ public class JsObject extends JsValue {
     @Override
     public String toString() {
         final StringJoiner joiner = new StringJoiner(", ");
-        for (JsEntity value : values) {
+        for (JsonEntity value : values) {
             joiner.add(value.toString());
         }
         return String.format("{%s}", joiner);

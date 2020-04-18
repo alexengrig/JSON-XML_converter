@@ -1,6 +1,6 @@
 package converter.json;
 
-public class JsNull extends JsValue {
+public class JsonNull extends JsonValue {
     @Override
     public String toString() {
         return "null";

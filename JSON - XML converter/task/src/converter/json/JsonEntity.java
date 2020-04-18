@@ -2,11 +2,11 @@ package converter.json;
 
 import converter.Pretty;
 
-public class JsEntity implements Pretty {
+public class JsonEntity implements Pretty {
     protected final String name;
-    protected final JsValue value;
+    protected final JsonValue value;
 
-    public JsEntity(String name, JsValue value) {
+    public JsonEntity(String name, JsonValue value) {
         this.name = name;
         this.value = value;
     }

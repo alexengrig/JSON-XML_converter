@@ -1,9 +1,9 @@
 package converter.json;
 
-public class JsInteger extends JsNumber {
+public class JsonInteger extends JsonNumber {
     protected final int value;
 
-    public JsInteger(int value) {
+    public JsonInteger(int value) {
         this.value = value;
     }
 

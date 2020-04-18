@@ -1,9 +1,9 @@
 package converter.json;
 
-public class JsDouble extends JsNumber {
+public class JsonDouble extends JsonNumber {
     protected final double value;
 
-    public JsDouble(double value) {
+    public JsonDouble(double value) {
         this.value = value;
     }
 

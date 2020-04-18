@@ -1,9 +1,9 @@
 package converter.json;
 
-public class JsBoolean extends JsValue {
+public class JsonBoolean extends JsonValue {
     protected final boolean value;
 
-    public JsBoolean(boolean value) {
+    public JsonBoolean(boolean value) {
         this.value = value;
     }
 

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class JsParser {
+public class JsonParser {
     protected static final Pattern NAME_PATTERN = Pattern.compile("\\s*\"[^\"]*\"\\s*:\\s*");
     protected static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+(\\.\\d+)?");
     protected static final String NULL = "null";
@@ -17,7 +17,7 @@ public class JsParser {
     protected static final char OPENING_SQUARE_BRACKET = '[';
     protected static final char CLOSING_SQUARE_BRACKET = ']';
 
-    public JsObject parse(String input) {
+    public JsonObject parse(String input) {
         final List<EntityRaw> raw = raw(input);
         return convert(raw);
     }
@@ -89,30 +89,30 @@ public class JsParser {
         return rawList;
     }
 
-    protected JsObject convert(List<EntityRaw> rawList) {
-        final ArrayList<JsEntity> entities = new ArrayList<>(rawList.size());
+    protected JsonObject convert(List<EntityRaw> rawList) {
+        final ArrayList<JsonEntity> entities = new ArrayList<>(rawList.size());
         for (EntityRaw raw : rawList) {
-            final JsValue value;
+            final JsonValue value;
             if (raw.type == RawType.OBJECT) {
                 value = convert(raw(raw.value));
             } else if (raw.type == RawType.STRING) {
-                value = new JsString(getValueFromQuotes(raw.value));
+                value = new JsonString(getValueFromQuotes(raw.value));
             } else if (raw.type == RawType.NULL) {
-                value = new JsNull();
+                value = new JsonNull();
             } else if (raw.type == RawType.BOOLEAN) {
-                value = new JsBoolean("true".equals(raw.value));
+                value = new JsonBoolean("true".equals(raw.value));
             } else if (raw.type == RawType.NUMBER) {
                 value = raw.value.contains(".")
-                        ? new JsDouble(Double.parseDouble(raw.value))
-                        : new JsInteger(Integer.parseInt(raw.value));
+                        ? new JsonDouble(Double.parseDouble(raw.value))
+                        : new JsonInteger(Integer.parseInt(raw.value));
             } else if (raw.type == RawType.ARRAY) {
                 throw new UnsupportedOperationException("Array is unsupported");
             } else {
                 throw new IllegalArgumentException("Unknown raw type: " + raw.type);
             }
-            entities.add(new JsEntity(raw.name, value));
+            entities.add(new JsonEntity(raw.name, value));
         }
-        return new JsObject(entities);
+        return new JsonObject(entities);
     }
 
     protected String getValueFromBraces(String input) {

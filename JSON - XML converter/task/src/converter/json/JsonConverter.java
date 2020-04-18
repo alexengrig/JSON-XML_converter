@@ -6,20 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JsConverter {
-    public XElement convert(JsObject json) {
-        final List<XElement> children = convertChildren(json);
+public class JsonConverter {
+    public XmlElement convert(JsonObject json) {
+        final List<XmlElement> children = convertChildren(json);
         if (children.size() == 1) {
             return children.get(0);
         } else {
-            return new XElement("root", new XElements(children));
+            return new XmlElement("root", new XmlElements(children));
         }
     }
 
-    private List<XElement> convertChildren(JsObject json) {
-        final List<XElement> elements = new ArrayList<>();
-        final List<JsEntity> entities = json.values;
-        for (JsEntity entity : entities) {
+    private List<XmlElement> convertChildren(JsonObject json) {
+        final List<XmlElement> elements = new ArrayList<>();
+        final List<JsonEntity> entities = json.values;
+        for (JsonEntity entity : entities) {
             if ("".equals(entity.name) || "@".equals(entity.name) || "#".equals(entity.name)) continue;
             final String name;
             if (entity.name.startsWith("@") || entity.name.startsWith("#")) {
@@ -28,41 +28,41 @@ public class JsConverter {
             } else {
                 name = entity.name;
             }
-            final JsValue value = entity.value;
+            final JsonValue value = entity.value;
             if (value.isSimple()) {
-                if (value instanceof JsNull) {
-                    elements.add(new XElement(name));
+                if (value instanceof JsonNull) {
+                    elements.add(new XmlElement(name));
                 } else {
-                    elements.add(new XElement(name, new XSimpleValue(value.toString())));
+                    elements.add(new XmlElement(name, new XmlSimpleValue(value.toString())));
                 }
-            } else if (value instanceof JsObject) {
-                final JsObject object = (JsObject) value;
+            } else if (value instanceof JsonObject) {
+                final JsonObject object = (JsonObject) value;
                 final boolean isXml = isXml(name, object);
                 if (isXml) {
                     final boolean hasXmlAttributes = hasXmlAttributes(object);
                     if (hasXmlAttributes && hasXmlValue(name, object)) {
-                        final XAttributes xmlAttributes = getXmlAttributes(object);
-                        final XValue xmlValue = getXmlValue(name, object);
+                        final XmlAttributes xmlAttributes = getXmlAttributes(object);
+                        final XmlValue xmlValue = getXmlValue(name, object);
                         if (xmlValue == null) {
-                            elements.add(new XElement(name, xmlAttributes));
+                            elements.add(new XmlElement(name, xmlAttributes));
                         } else {
-                            elements.add(new XElement(name, xmlAttributes, xmlValue));
+                            elements.add(new XmlElement(name, xmlAttributes, xmlValue));
                         }
                     } else {
-                        final XValue xmlValue = getXmlValue(name, object);
+                        final XmlValue xmlValue = getXmlValue(name, object);
                         if (xmlValue == null) {
-                            elements.add(new XElement(name));
+                            elements.add(new XmlElement(name));
                         } else {
-                            elements.add(new XElement(name, xmlValue));
+                            elements.add(new XmlElement(name, xmlValue));
                         }
                     }
                 } else {
-                    final List<XElement> children = convertChildren(object);
+                    final List<XmlElement> children = convertChildren(object);
                     if (children.isEmpty()) {
-                        elements.add(new XElement(name, new XSimpleValue()));
+                        elements.add(new XmlElement(name, new XmlSimpleValue()));
                     } else {
-                        final XElements xmlElements = new XElements(children);
-                        elements.add(new XElement(name, xmlElements));
+                        final XmlElements xmlElements = new XmlElements(children);
+                        elements.add(new XmlElement(name, xmlElements));
                     }
                 }
             } else {
@@ -72,7 +72,7 @@ public class JsConverter {
         return elements;
     }
 
-    private boolean isXml(String name, JsObject object) {
+    private boolean isXml(String name, JsonObject object) {
         final boolean isValid = object.values
                 .stream()
                 .allMatch(o -> o.name.length() > 1
@@ -88,46 +88,46 @@ public class JsConverter {
         return values.size() == 1 && ("#" + name).equals(values.get(0));
     }
 
-    private boolean hasXmlAttributes(JsObject object) {
+    private boolean hasXmlAttributes(JsonObject object) {
         return object.values.stream().map(e -> e.name).anyMatch(n -> n.startsWith("@") && n.length() > 1);
     }
 
-    private boolean hasXmlValue(String name, JsObject object) {
+    private boolean hasXmlValue(String name, JsonObject object) {
         return object.values.stream().anyMatch(e -> ("#" + name).equals(e.name));
     }
 
-    private XAttributes getXmlAttributes(JsObject object) {
-        return new XAttributes(object.values.stream()
+    private XmlAttributes getXmlAttributes(JsonObject object) {
+        return new XmlAttributes(object.values.stream()
                 .filter(e -> e.name.startsWith("@") && e.name.length() > 1)
                 .map(this::getXmlAttribute)
                 .collect(Collectors.toList()));
     }
 
-    private XAttribute getXmlAttribute(JsEntity entity) {
+    private XmlAttribute getXmlAttribute(JsonEntity entity) {
         final String name = entity.name.substring(1);
         final String value;
-        if (entity.value instanceof JsNull) {
+        if (entity.value instanceof JsonNull) {
             value = "";
         } else {
             value = entity.value.toString();
         }
-        return new XAttribute(name, value);
+        return new XmlAttribute(name, value);
     }
 
-    private XValue getXmlValue(String name, JsObject object) {
+    private XmlValue getXmlValue(String name, JsonObject object) {
         return object.values.stream()
                 .filter(e -> ("#" + name).equals(e.name))
                 .limit(1)
-                .filter(e -> !(e.value instanceof JsNull))
+                .filter(e -> !(e.value instanceof JsonNull))
                 .map(e -> {
                     if (e.value.isSimple()) {
-                        return new XSimpleValue(e.value.toString());
+                        return new XmlSimpleValue(e.value.toString());
                     } else {
-                        final List<XElement> children = convertChildren((JsObject) e.value);
+                        final List<XmlElement> children = convertChildren((JsonObject) e.value);
                         if (children.isEmpty()) {
-                            return new XSimpleValue();
+                            return new XmlSimpleValue();
                         } else {
-                            return new XElements(children);
+                            return new XmlElements(children);
                         }
                     }
                 })
