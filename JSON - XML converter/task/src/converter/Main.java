@@ -3,9 +3,9 @@ package converter;
 import converter.json.JsConverter;
 import converter.json.JsObject;
 import converter.json.JsParser;
-import converter.x.XConverter;
-import converter.x.XElement;
-import converter.x.XParser;
+import converter.xml.XConverter;
+import converter.xml.XElement;
+import converter.xml.XParser;
 
 import java.io.File;
 import java.io.FileReader;

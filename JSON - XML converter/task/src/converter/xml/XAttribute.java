@@ -1,4 +1,4 @@
-package converter.x;
+package converter.xml;
 
 public class XAttribute {
     protected final String name;

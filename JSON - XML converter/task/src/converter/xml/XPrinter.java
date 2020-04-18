@@ -1,4 +1,4 @@
-package converter.x;
+package converter.xml;
 
 import java.io.PrintStream;
 

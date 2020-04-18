@@ -1,4 +1,4 @@
-package converter.x;
+package converter.xml;
 
 public class XElement extends XComplexValue {
     protected final String name;

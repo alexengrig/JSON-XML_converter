@@ -1,4 +1,4 @@
-package converter.x;
+package converter.xml;
 
 public class XSimpleValue extends XValue {
     protected final String value;

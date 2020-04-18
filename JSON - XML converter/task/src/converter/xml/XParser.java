@@ -1,4 +1,4 @@
-package converter.x;
+package converter.xml;
 
 import java.util.ArrayList;
 import java.util.List;
