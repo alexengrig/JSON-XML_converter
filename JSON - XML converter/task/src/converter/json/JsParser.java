@@ -1,4 +1,4 @@
-package converter.js;
+package converter.json;
 
 import java.util.ArrayList;
 import java.util.List;

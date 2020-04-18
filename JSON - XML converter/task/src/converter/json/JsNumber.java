@@ -1,4 +1,4 @@
-package converter.js;
+package converter.json;
 
 public abstract class JsNumber extends JsValue {
 }

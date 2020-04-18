@@ -1,4 +1,4 @@
-package converter.js;
+package converter.json;
 
 public class JsString extends JsValue {
     protected final String value;

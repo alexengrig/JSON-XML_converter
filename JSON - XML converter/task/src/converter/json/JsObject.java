@@ -1,4 +1,4 @@
-package converter.js;
+package converter.json;
 
 import java.util.Collections;
 import java.util.List;

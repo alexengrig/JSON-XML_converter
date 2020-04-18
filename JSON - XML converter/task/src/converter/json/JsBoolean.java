@@ -1,4 +1,4 @@
-package converter.js;
+package converter.json;
 
 public class JsBoolean extends JsValue {
     protected final boolean value;

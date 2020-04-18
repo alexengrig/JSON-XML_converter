@@ -1,4 +1,4 @@
-package converter.js;
+package converter.json;
 
 public class JsDouble extends JsNumber {
     protected final double value;

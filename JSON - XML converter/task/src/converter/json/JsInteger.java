@@ -1,4 +1,4 @@
-package converter.js;
+package converter.json;
 
 public class JsInteger extends JsNumber {
     protected final int value;

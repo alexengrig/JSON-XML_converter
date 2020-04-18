@@ -1,4 +1,4 @@
-package converter.js;
+package converter.json;
 
 import java.util.List;
 import java.util.StringJoiner;

@@ -1,8 +1,8 @@
 package converter;
 
-import converter.js.JsConverter;
-import converter.js.JsObject;
-import converter.js.JsParser;
+import converter.json.JsConverter;
+import converter.json.JsObject;
+import converter.json.JsParser;
 import converter.x.XConverter;
 import converter.x.XElement;
 import converter.x.XParser;
