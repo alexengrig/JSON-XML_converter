@@ -1,11 +1,13 @@
 package converter.xml;
 
+import converter.Converter;
 import converter.json.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class XmlConverter {
+public class Xml2JsonConverter implements Converter<XmlElement, JsonObject> {
+    @Override
     public JsonObject convert(XmlElement xml) {
         final List<JsonEntity> values = new ArrayList<>();
         if (xml.value instanceof XmlSimpleValue) {

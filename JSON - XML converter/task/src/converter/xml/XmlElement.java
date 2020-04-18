@@ -1,6 +1,8 @@
 package converter.xml;
 
-public class XmlElement extends XmlComplexValue {
+import converter.Subject;
+
+public class XmlElement extends XmlComplexValue implements Subject {
     protected final String name;
     protected final XmlAttributes attributes;
     protected final XmlValue value;

@@ -1,10 +1,12 @@
 package converter.json;
 
+import converter.Subject;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class JsonObject extends JsonValue {
+public class JsonObject extends JsonValue implements Subject {
     protected final List<JsonEntity> values;
 
     public JsonObject(List<JsonEntity> values) {

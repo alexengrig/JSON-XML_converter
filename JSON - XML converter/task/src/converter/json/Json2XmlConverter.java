@@ -1,12 +1,14 @@
 package converter.json;
 
+import converter.Converter;
 import converter.xml.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JsonConverter {
+public class Json2XmlConverter implements Converter<JsonObject, XmlElement> {
+    @Override
     public XmlElement convert(JsonObject json) {
         final List<XmlElement> children = convertChildren(json);
         if (children.size() == 1) {

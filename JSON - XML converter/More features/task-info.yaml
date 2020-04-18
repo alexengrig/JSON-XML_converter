@@ -1344,6 +1344,18 @@ files:
         }
     }
   learner_created: false
+- name: src/converter/Subject.java
+  visible: true
+  learner_created: true
+- name: src/converter/Parser.java
+  visible: true
+  learner_created: true
+- name: src/converter/Converter.java
+  visible: true
+  learner_created: true
+- name: src/converter/Type.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/61/stages/334/implement
 status: Unchecked
 record: -1

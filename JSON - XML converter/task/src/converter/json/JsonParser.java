@@ -1,11 +1,13 @@
 package converter.json;
 
+import converter.Parser;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class JsonParser {
+public class JsonParser implements Parser<JsonObject> {
     protected static final Pattern NAME_PATTERN = Pattern.compile("\\s*\"[^\"]*\"\\s*:\\s*");
     protected static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+(\\.\\d+)?");
     protected static final String NULL = "null";
@@ -17,6 +19,7 @@ public class JsonParser {
     protected static final char OPENING_SQUARE_BRACKET = '[';
     protected static final char CLOSING_SQUARE_BRACKET = ']';
 
+    @Override
     public JsonObject parse(String input) {
         final List<EntityRaw> raw = raw(input);
         return convert(raw);

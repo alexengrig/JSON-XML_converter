@@ -1,9 +1,9 @@
 package converter;
 
-import converter.json.JsonConverter;
+import converter.json.Json2XmlConverter;
 import converter.json.JsonObject;
 import converter.json.JsonParser;
-import converter.xml.XmlConverter;
+import converter.xml.Xml2JsonConverter;
 import converter.xml.XmlElement;
 import converter.xml.XmlParser;
 
@@ -15,15 +15,15 @@ public class Main {
     public static void main(String[] args) throws IOException {
         final String input = getInputFromFile();
         if (isJson(input)) {
-            final JsonParser parser = new JsonParser();
+            final Parser<JsonObject> parser = new JsonParser();
             final JsonObject json = parser.parse(input);
-            final JsonConverter converter = new JsonConverter();
+            final Converter<JsonObject, XmlElement> converter = new Json2XmlConverter();
             final XmlElement xml = converter.convert(json);
             System.out.println(xml);
         } else if (isXml(input)) {
-            final XmlParser parser = new XmlParser();
+            final Parser<XmlElement> parser = new XmlParser();
             final XmlElement xml = parser.parse(input);
-            final XmlConverter converter = new XmlConverter();
+            final Converter<XmlElement, JsonObject> converter = new Xml2JsonConverter();
             final JsonObject json = converter.convert(xml);
             System.out.println(json.toPretty());
         } else {

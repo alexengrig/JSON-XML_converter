@@ -1,17 +1,20 @@
 package converter.xml;
 
+import converter.Parser;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class XmlParser {
+public class XmlParser implements Parser<XmlElement> {
     protected static final String START = "<";
     protected static final String END = ">";
     protected static final String SLASH = "/";
     protected static final String START_SLASH = START + SLASH;
     protected static final String SLASH_END = SLASH + END;
 
+    @Override
     public XmlElement parse(String input) {
         final List<String> parts = split(input);
         final List<Raw> rawList = raw(parts);
