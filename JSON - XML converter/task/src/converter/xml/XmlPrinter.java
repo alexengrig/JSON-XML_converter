@@ -2,16 +2,16 @@ package converter.xml;
 
 import java.io.PrintStream;
 
-public class XPrinter {
+public class XmlPrinter {
     private PrintStream printer;
 
-    public XPrinter() {
+    public XmlPrinter() {
         printer = System.out;
     }
 
-    public void print(XElement element) {
+    public void print(XmlElement element) {
         final String path = element.name;
-        final XValue value = element.value;
+        final XmlValue value = element.value;
         printElement();
         printPath(path);
         printValue(value);
@@ -20,19 +20,19 @@ public class XPrinter {
         printNext(path, value);
     }
 
-    private void printNext(String path, XValue value) {
-        if (value instanceof XElement) {
-            print(path, (XElement) value);
-        } else if (value instanceof XElements) {
-            for (XComplexValue xElement : ((XElements) value).values) {
-                print(path, (XElement) xElement);
+    private void printNext(String path, XmlValue value) {
+        if (value instanceof XmlElement) {
+            print(path, (XmlElement) value);
+        } else if (value instanceof XmlElements) {
+            for (XmlComplexValue xElement : ((XmlElements) value).values) {
+                print(path, (XmlElement) xElement);
             }
         }
     }
 
-    private void print(String parentPath, XElement element) {
+    private void print(String parentPath, XmlElement element) {
         final String path = parentPath + ", " + element.name;
-        final XValue value = element.value;
+        final XmlValue value = element.value;
         printElement();
         printPath(path);
         printValue(value);
@@ -49,19 +49,19 @@ public class XPrinter {
         printer.println("path = " + path);
     }
 
-    private void printValue(XValue value) {
+    private void printValue(XmlValue value) {
         if (value == null) {
             printer.println("value = null");
-        } else if (value instanceof XSimpleValue) {
-            final XSimpleValue simpleValue = (XSimpleValue) value;
+        } else if (value instanceof XmlSimpleValue) {
+            final XmlSimpleValue simpleValue = (XmlSimpleValue) value;
             printer.println("value = \"" + simpleValue + "\"");
         }
     }
 
-    private void printAttributes(XAttributes attributes) {
+    private void printAttributes(XmlAttributes attributes) {
         if (attributes != null) {
             printer.println("attributes:");
-            for (XAttribute attribute : attributes.values) {
+            for (XmlAttribute attribute : attributes.values) {
                 printer.println(attribute.name + " = \"" + attribute.value + "\"");
             }
         }

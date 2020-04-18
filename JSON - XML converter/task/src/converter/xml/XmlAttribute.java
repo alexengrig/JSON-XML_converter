@@ -1,14 +1,14 @@
 package converter.xml;
 
-public class XAttribute {
+public class XmlAttribute {
     protected final String name;
     protected final String value;
 
-    public XAttribute(String name) {
+    public XmlAttribute(String name) {
         this(name, null);
     }
 
-    public XAttribute(String name, String value) {
+    public XmlAttribute(String name, String value) {
         this.name = name;
         this.value = value;
     }

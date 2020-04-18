@@ -1,23 +1,23 @@
 package converter.xml;
 
-public class XElement extends XComplexValue {
+public class XmlElement extends XmlComplexValue {
     protected final String name;
-    protected final XAttributes attributes;
-    protected final XValue value;
+    protected final XmlAttributes attributes;
+    protected final XmlValue value;
 
-    public XElement(String name) {
+    public XmlElement(String name) {
         this(name, null, null);
     }
 
-    public XElement(String name, XAttributes attributes) {
+    public XmlElement(String name, XmlAttributes attributes) {
         this(name, attributes, null);
     }
 
-    public XElement(String name, XValue value) {
+    public XmlElement(String name, XmlValue value) {
         this(name, null, value);
     }
 
-    public XElement(String name, XAttributes attributes, XValue value) {
+    public XmlElement(String name, XmlAttributes attributes, XmlValue value) {
         this.name = name;
         this.attributes = attributes;
         this.value = value;

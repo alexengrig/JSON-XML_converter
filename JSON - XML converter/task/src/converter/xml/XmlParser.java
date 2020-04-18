@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class XParser {
+public class XmlParser {
     protected static final String START = "<";
     protected static final String END = ">";
     protected static final String SLASH = "/";
     protected static final String START_SLASH = START + SLASH;
     protected static final String SLASH_END = SLASH + END;
 
-    public XElement parse(String input) {
+    public XmlElement parse(String input) {
         final List<String> parts = split(input);
         final List<Raw> rawList = raw(parts);
         return convert(rawList);
@@ -53,20 +53,20 @@ public class XParser {
         return list;
     }
 
-    private XElement convert(List<Raw> rawList) {
+    private XmlElement convert(List<Raw> rawList) {
         final Raw parent = rawList.get(0);
-        final List<XElement> values = new ArrayList<>();
-        XSimpleValue simpleValue = null;
+        final List<XmlElement> values = new ArrayList<>();
+        XmlSimpleValue simpleValue = null;
         for (int i = 1; i < rawList.size() - 1; i++) {
             final Result result = convert(rawList, i);
-            if (result.value instanceof XSimpleValue) {
-                simpleValue = (XSimpleValue) result.value;
+            if (result.value instanceof XmlSimpleValue) {
+                simpleValue = (XmlSimpleValue) result.value;
                 break;
             }
-            values.add((XElement) result.value);
+            values.add((XmlElement) result.value);
             i = result.lastIndex;
         }
-        final XElement element;
+        final XmlElement element;
         if (simpleValue != null) {
             element = getElement(parent, simpleValue);
         } else {
@@ -79,17 +79,17 @@ public class XParser {
         final Raw parent = rawList.get(from);
         if (parent.type == RawType.EMPTY) {
             if (hasAttributes(parent.value)) {
-                return new Result(from, new XElement(parent.name, getAttributes(parent)));
+                return new Result(from, new XmlElement(parent.name, getAttributes(parent)));
             } else {
-                return new Result(from, new XElement(parent.name));
+                return new Result(from, new XmlElement(parent.name));
             }
         } else if (parent.type == RawType.VALUE) {
-            return new Result(from + 1, new XSimpleValue(parent.value));
+            return new Result(from + 1, new XmlSimpleValue(parent.value));
         } else if (parent.type == RawType.CLOSING) {
-            return new Result(from, new XSimpleValue());
+            return new Result(from, new XmlSimpleValue());
         }
-        final List<XElement> values = new ArrayList<>();
-        XSimpleValue simpleValue = null;
+        final List<XmlElement> values = new ArrayList<>();
+        XmlSimpleValue simpleValue = null;
         boolean isOpen = true;
         int countOpen = 1;
         int countClosed = 0;
@@ -99,24 +99,24 @@ public class XParser {
             switch (raw.type) {
                 case EMPTY: {
                     if (hasAttributes(raw.value)) {
-                        values.add(new XElement(raw.name, getAttributes(raw)));
+                        values.add(new XmlElement(raw.name, getAttributes(raw)));
                     } else {
-                        values.add(new XElement(raw.name));
+                        values.add(new XmlElement(raw.name));
                     }
                     break;
                 }
                 case OPEN: {
                     final Result result = convert(rawList, index + 1);
                     if (hasAttributes(raw.value)) {
-                        values.add(new XElement(raw.name, getAttributes(raw), result.value));
+                        values.add(new XmlElement(raw.name, getAttributes(raw), result.value));
                     } else {
-                        values.add(new XElement(raw.name, result.value));
+                        values.add(new XmlElement(raw.name, result.value));
                     }
                     index = result.lastIndex;
                     break;
                 }
                 case VALUE: {
-                    simpleValue = new XSimpleValue(raw.value);
+                    simpleValue = new XmlSimpleValue(raw.value);
                     isOpen = false;
                     index++;
                     break;
@@ -132,7 +132,7 @@ public class XParser {
                 }
             }
         }
-        final XElement element;
+        final XmlElement element;
         if (simpleValue != null) {
             element = getElement(parent, simpleValue);
         } else {
@@ -141,15 +141,15 @@ public class XParser {
         return new Result(index - 1, element);
     }
 
-    private XElement getElement(Raw raw, XValue value) {
+    private XmlElement getElement(Raw raw, XmlValue value) {
         if (hasAttributes(raw.value)) {
-            return new XElement(raw.name, getAttributes(raw), value);
+            return new XmlElement(raw.name, getAttributes(raw), value);
         } else {
-            return new XElement(raw.name, value);
+            return new XmlElement(raw.name, value);
         }
     }
 
-    private XAttributes getAttributes(Raw raw) {
+    private XmlAttributes getAttributes(Raw raw) {
         final int beginIndex = START.length() + raw.name.length();
         final String rawValue = raw.value;
         final int rawLength = rawValue.length();
@@ -158,33 +158,33 @@ public class XParser {
                 : rawLength - END.length();
         final String value = rawValue.substring(beginIndex, endIndex);
         final Matcher matcher = Pattern.compile("\\w+(\\s*=\\s*\"\\w*\")?").matcher(value);
-        final ArrayList<XAttribute> attributes = new ArrayList<>();
+        final ArrayList<XmlAttribute> attributes = new ArrayList<>();
         while (matcher.find()) {
             final String rawAttribute = matcher.group();
             attributes.add(getAttribute(rawAttribute));
         }
-        return new XAttributes(attributes);
+        return new XmlAttributes(attributes);
     }
 
-    private XAttribute getAttribute(String attribute) {
+    private XmlAttribute getAttribute(String attribute) {
         if (attribute.matches("\\w+\\s*=.*")) {
             final int index = attribute.indexOf("=");
             final String name = attribute.substring(0, index).trim();
             final String quotedValue = attribute.substring(index + 1).trim();
             final String value = quotedValue.substring(1, quotedValue.length() - 1);
-            return new XAttribute(name, value);
+            return new XmlAttribute(name, value);
         } else {
-            return new XAttribute(attribute.trim());
+            return new XmlAttribute(attribute.trim());
         }
     }
 
-    private XValue getValue(List<XElement> values) {
+    private XmlValue getValue(List<XmlElement> values) {
         if (values.isEmpty()) {
-            return new XSimpleValue();
+            return new XmlSimpleValue();
         } else if (values.size() == 1) {
             return values.get(0);
         } else {
-            return new XElements(values);
+            return new XmlElements(values);
         }
     }
 
@@ -248,9 +248,9 @@ public class XParser {
 
     private static class Result {
         final int lastIndex;
-        final XValue value;
+        final XmlValue value;
 
-        Result(int lastIndex, XValue value) {
+        Result(int lastIndex, XmlValue value) {
             this.lastIndex = lastIndex;
             this.value = value;
         }

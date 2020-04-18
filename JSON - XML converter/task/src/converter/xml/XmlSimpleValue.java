@@ -1,13 +1,13 @@
 package converter.xml;
 
-public class XSimpleValue extends XValue {
+public class XmlSimpleValue extends XmlValue {
     protected final String value;
 
-    public XSimpleValue() {
+    public XmlSimpleValue() {
         this("");
     }
 
-    public XSimpleValue(String value) {
+    public XmlSimpleValue(String value) {
         this.value = value;
     }
 
