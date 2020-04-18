@@ -610,12 +610,6 @@ files:
         }
     }
   learner_created: false
-- name: src/main/resources/foo.json
-  visible: true
-  learner_created: true
-- name: test.txt
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/projects/61/stages/332/implement
 status: Solved
 record: 1
