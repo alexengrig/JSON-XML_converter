@@ -15,6 +15,10 @@ public class JsObject extends JsValue {
         this(Collections.singletonList(entity));
     }
 
+    public JsObject(String name, JsObject value) {
+        this(new JsEntity(name, value));
+    }
+
     @Override
     public boolean isSimple() {
         return false;
