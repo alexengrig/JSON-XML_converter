@@ -1,3 +1,4 @@
+// Posted from EduTools plugin
 import java.util.Scanner; 
 
 /** Product */
@@ -61,7 +62,10 @@ class RobotFactory {
 
     /** Factory Method **/
     public Robot getRobot(RobotType type,String name, String description,int power) {
-        /** write your code here ... */
+        if (RobotType.ROBOT_CLEANER == type) {
+            return new RobotCleaner(name, description, power);
+        }
+        return null;
     }
 }
 

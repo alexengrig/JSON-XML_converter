@@ -1,3 +1,4 @@
+// Posted from EduTools plugin
 /**
  * The function accepts a list of mappers and returns an operator that accepts a list of integers
  * and sequentially applies each mapper to each value (perform a transformation)
@@ -5,8 +6,7 @@
 public static final Function<List<IntUnaryOperator>, UnaryOperator<List<Integer>>> multifunctionalMapper =
         operators -> integers -> integers.stream()
         .map(operators.stream()
-        .reduce(IntUnaryOperator::andThen)
-        .orElseGet(IntUnaryOperator::identity)
+        .reduce(IntUnaryOperator.identity(), IntUnaryOperator::andThen)
         ::applyAsInt)
         .collect(Collectors.toList());
 
