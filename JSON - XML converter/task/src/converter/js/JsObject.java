@@ -1,5 +1,6 @@
 package converter.js;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -8,6 +9,10 @@ public class JsObject extends JsValue {
 
     public JsObject(List<JsEntity> values) {
         this.values = values;
+    }
+
+    public JsObject(JsEntity entity) {
+        this(Collections.singletonList(entity));
     }
 
     @Override
