@@ -923,12 +923,6 @@ files:
         }
     }
   learner_created: false
-- name: src/converter/x/XConverter.java
-  visible: true
-  learner_created: true
-- name: src/converter/Pretty.java
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/projects/61/stages/333/implement
-status: Failed
+status: Solved
 record: -1
