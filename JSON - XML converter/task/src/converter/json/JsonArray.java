@@ -11,8 +11,12 @@ public class JsonArray extends JsonValue {
     }
 
     @Override
-    public boolean isSimple() {
-        return false;
+    public String toPretty() {
+        final StringJoiner joiner = new StringJoiner(", ");
+        for (JsonValue value : values) {
+            joiner.add(value.toPretty());
+        }
+        return String.format("[%s]", joiner);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package converter.json;
 
-public class JsonBoolean extends JsonValue {
+public class JsonBoolean extends JsonPrimitive {
     protected final boolean value;
 
     public JsonBoolean(boolean value) {

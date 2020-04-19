@@ -8,7 +8,4 @@ public abstract class JsonValue implements Pretty {
         return toString();
     }
 
-    public boolean isSimple() {
-        return true;
-    }
 }

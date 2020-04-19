@@ -22,11 +22,6 @@ public class JsonObject extends JsonValue implements Subject {
     }
 
     @Override
-    public boolean isSimple() {
-        return false;
-    }
-
-    @Override
     public String toPretty() {
         final StringJoiner joiner = new StringJoiner(", ");
         for (JsonEntity value : values) {

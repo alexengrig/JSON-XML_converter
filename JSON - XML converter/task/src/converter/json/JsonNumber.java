@@ -1,4 +1,4 @@
 package converter.json;
 
-public abstract class JsonNumber extends JsonValue {
+public abstract class JsonNumber extends JsonPrimitive {
 }

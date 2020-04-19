@@ -1,6 +1,6 @@
 package converter.json;
 
-public class JsonString extends JsonValue {
+public class JsonString extends JsonPrimitive {
     protected final String value;
 
     public JsonString(String value) {
