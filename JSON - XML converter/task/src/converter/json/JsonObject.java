@@ -17,7 +17,7 @@ public class JsonObject extends JsonValue implements Subject {
         this(Collections.singletonList(entity));
     }
 
-    public JsonObject(String name, JsonObject value) {
+    public JsonObject(String name, JsonValue value) {
         this(new JsonEntity(name, value));
     }
 
