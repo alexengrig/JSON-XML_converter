@@ -10,15 +10,25 @@ import java.util.regex.Pattern;
 public class XmlParser implements Parser<XmlElement> {
     protected static final String START = "<";
     protected static final String END = ">";
+    protected static final String START_HEADER = "<?";
+    protected static final String END_HEADER = "?>";
     protected static final String SLASH = "/";
     protected static final String START_SLASH = START + SLASH;
     protected static final String SLASH_END = SLASH + END;
 
     @Override
     public XmlElement parse(String input) {
-        final List<String> parts = split(input);
+        final String content = getContent(input);
+        final List<String> parts = split(content);
         final List<Raw> rawList = raw(parts);
         return convert(rawList);
+    }
+
+    private String getContent(String input) {
+        if (input.contains(START_HEADER)) {
+            return input.substring(input.indexOf(END_HEADER) + END_HEADER.length());
+        }
+        return input;
     }
 
     private List<String> split(String input) {
