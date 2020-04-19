@@ -27,7 +27,7 @@ public class Json2XmlConverter implements Converter<JsonObject, XmlElement> {
         final List<XmlElement> elements = new ArrayList<>();
         final List<JsonEntity> entities = json.values;
         for (JsonEntity entity : entities) {
-            if ("".equals(entity.name) || ATTRIBUTE.equals(entity.name) || VALUE.equals(entity.name)) continue;
+            if (entity.name.isEmpty() || ATTRIBUTE.equals(entity.name) || VALUE.equals(entity.name)) continue;
             final String name;
             if (entity.name.startsWith(ATTRIBUTE) || entity.name.startsWith(VALUE)) {
                 name = entity.name.substring(1);
@@ -35,62 +35,85 @@ public class Json2XmlConverter implements Converter<JsonObject, XmlElement> {
             } else {
                 name = entity.name;
             }
-            final JsonValue value = entity.value;
-            if (value.isSimple()) {
-                if (value instanceof JsonNull) {
-                    elements.add(new XmlElement(name));
+            final XmlElement element;
+            if (entity.value instanceof JsonNull) {
+                element = convertNull(name);
+            } else if (entity.value instanceof JsonPrimitive) {
+                element = convertPrimitive(name, (JsonPrimitive) entity.value);
+            } else if (entity.value instanceof JsonObject) {
+                element = convertObject(name, (JsonObject) entity.value);
+            } else if (entity.value instanceof JsonArray) {
+                element = convertArray(name, (JsonArray) entity.value);
+            } else {
+                throw new UnsupportedOperationException("Unsupported JSON value type: " + entity.value);
+            }
+            elements.add(element);
+        }
+        return elements;
+    }
+
+    private XmlElement convertNull(String name) {
+        return new XmlElement(name);
+    }
+
+    private XmlElement convertPrimitive(String name, JsonPrimitive primitive) {
+        return new XmlElement(name, new XmlSimpleValue(primitive.toString()));
+    }
+
+    private XmlElement convertObject(String name, JsonObject object) {
+        if (isXml(name, object)) {
+            final XmlValue value = getXmlValue(name, object);
+            if (hasXmlAttributes(object) && hasXmlValue(name, object)) {
+                final XmlAttributes attributes = getXmlAttributes(object);
+                if (value == null) {
+                    return new XmlElement(name, attributes);
                 } else {
-                    elements.add(new XmlElement(name, new XmlSimpleValue(value.toString())));
+                    return new XmlElement(name, attributes, value);
                 }
+            } else {
+                if (value == null) {
+                    return convertNull(name);
+                } else {
+                    return new XmlElement(name, value);
+                }
+            }
+        } else {
+            final List<XmlElement> children = convertChildren(object);
+            final XmlValue value;
+            if (children.isEmpty()) {
+                value = new XmlSimpleValue();
+            } else {
+                value = new XmlElements(children);
+            }
+            return new XmlElement(name, value);
+        }
+    }
+
+    private XmlElement convertArray(String name, JsonArray array) {
+        final List<XmlElement> values = new ArrayList<>();
+        XmlElement element;
+        for (JsonValue value : array.values) {
+            if (value instanceof JsonNull) {
+                element = convertNull(ELEMENT);
+            } else if (value instanceof JsonPrimitive) {
+                element = convertPrimitive(ELEMENT, (JsonPrimitive) value);
             } else if (value instanceof JsonObject) {
-                final JsonObject object = (JsonObject) value;
-                final boolean isXml = isXml(name, object);
-                if (isXml) {
-                    final boolean hasXmlAttributes = hasXmlAttributes(object);
-                    if (hasXmlAttributes && hasXmlValue(name, object)) {
-                        final XmlAttributes xmlAttributes = getXmlAttributes(object);
-                        final XmlValue xmlValue = getXmlValue(name, object);
-                        if (xmlValue == null) {
-                            elements.add(new XmlElement(name, xmlAttributes));
-                        } else {
-                            elements.add(new XmlElement(name, xmlAttributes, xmlValue));
-                        }
-                    } else {
-                        final XmlValue xmlValue = getXmlValue(name, object);
-                        if (xmlValue == null) {
-                            elements.add(new XmlElement(name));
-                        } else {
-                            elements.add(new XmlElement(name, xmlValue));
-                        }
-                    }
-                } else {
-                    final List<XmlElement> children = convertChildren(object);
-                    if (children.isEmpty()) {
-                        elements.add(new XmlElement(name, new XmlSimpleValue()));
-                    } else {
-                        final XmlElements xmlElements = new XmlElements(children);
-                        elements.add(new XmlElement(name, xmlElements));
-                    }
-                }
+                element = convertObject(ELEMENT, (JsonObject) value);
             } else if (value instanceof JsonArray) {
-                final JsonArray array = (JsonArray) value;
-                final List<XmlElement> values = new ArrayList<>();
-                for (JsonValue item : array.values) {
-                    values.add(new XmlElement(ELEMENT));
-                }
-                elements.add(new XmlElement(name, new XmlElements(values)));
+                element = convertArray(ELEMENT, (JsonArray) value);
             } else {
                 throw new UnsupportedOperationException("Unsupported JSON value type: " + value);
             }
+            values.add(element);
         }
-        return elements;
+        return new XmlElement(name, new XmlElements(values));
     }
 
     private boolean isXml(String name, JsonObject object) {
         final boolean isValid = object.values
                 .stream()
                 .allMatch(o -> o.name.length() > 1
-                        && ((o.name.startsWith(ATTRIBUTE) && o.value.isSimple()) || o.name.startsWith(VALUE)));
+                        && ((o.name.startsWith(ATTRIBUTE) && o.value instanceof JsonPrimitive) || o.name.startsWith(VALUE)));
         if (!isValid) {
             return false;
         }
@@ -134,7 +157,7 @@ public class Json2XmlConverter implements Converter<JsonObject, XmlElement> {
                 .limit(1)
                 .filter(e -> !(e.value instanceof JsonNull))
                 .map(e -> {
-                    if (e.value.isSimple()) {
+                    if (e.value instanceof JsonPrimitive) {
                         return new XmlSimpleValue(e.value.toString());
                     } else {
                         final List<XmlElement> children = convertChildren((JsonObject) e.value);
