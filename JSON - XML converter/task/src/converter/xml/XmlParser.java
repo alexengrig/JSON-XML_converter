@@ -170,7 +170,7 @@ public class XmlParser implements Parser<XmlElement> {
                 ? rawLength - SLASH_END.length()
                 : rawLength - END.length();
         final String value = rawValue.substring(beginIndex, endIndex);
-        final Matcher matcher = Pattern.compile("\\w+(\\s*=\\s*\"\\w*\")?").matcher(value);
+        final Matcher matcher = Pattern.compile("\\w+(\\s*=\\s*(\"\\w*\"|'\\w*'))?").matcher(value);
         final ArrayList<XmlAttribute> attributes = new ArrayList<>();
         while (matcher.find()) {
             final String rawAttribute = matcher.group();
