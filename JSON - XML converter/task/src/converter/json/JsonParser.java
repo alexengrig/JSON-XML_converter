@@ -91,7 +91,7 @@ public class JsonParser implements Parser<JsonObject> {
         char ch;
         for (int i = 0, l = content.length(); i < l; i++) {
             ch = content.charAt(i);
-            if (Character.isWhitespace(ch)) continue;
+            if (Character.isWhitespace(ch) || ',' == ch) continue;
             valueBegin = i;
             ch = content.charAt(valueBegin);
             if (ch == OPENING_BRACE) {
