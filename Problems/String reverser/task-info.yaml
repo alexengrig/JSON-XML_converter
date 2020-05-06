@@ -1,0 +1,10 @@
+type: code
+files:
+  - name: src/Main.java
+    visible: true
+    text: "StringReverser reverser = /* create an instance of an anonymous class here,\
+    \ \n                             do not forget ; on the end */"
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/2549
+status: Solved
+record: -1
