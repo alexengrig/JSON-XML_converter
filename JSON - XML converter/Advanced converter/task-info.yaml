@@ -923,6 +923,14 @@ files:
         }
     }
   learner_created: false
+- name: src/converter/json/JsonPrimitive.java
+  visible: true
+  text: |
+    package converter.json;
+
+    public abstract class JsonPrimitive extends JsonValue {
+    }
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/61/stages/333/implement
 status: Solved
 record: 2
