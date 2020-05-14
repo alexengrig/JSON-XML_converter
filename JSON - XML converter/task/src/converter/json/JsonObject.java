@@ -32,6 +32,18 @@ public class JsonObject extends JsonValue implements Subject {
     }
 
     @Override
+    public String toPretty(int level) {
+        final int nextLevel = level + 1;
+        final String nextIndent = INDENT.repeat(nextLevel);
+        final StringJoiner joiner = new StringJoiner(",\n" + nextIndent);
+        for (JsonEntity value : values) {
+            joiner.add(value.toPretty(nextLevel));
+        }
+        final String indent = INDENT.repeat(level);
+        return String.format("{\n" + nextIndent + "%s\n" + indent + "}", joiner);
+    }
+
+    @Override
     public String toString() {
         final StringJoiner joiner = new StringJoiner(", ");
         for (JsonEntity value : values) {

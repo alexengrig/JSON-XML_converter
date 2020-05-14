@@ -17,6 +17,11 @@ public class JsonEntity implements Pretty {
     }
 
     @Override
+    public String toPretty(int level) {
+        return String.format("\"%s\": %s", name, value.toPretty(level));
+    }
+
+    @Override
     public String toString() {
         return String.format("\"%s\": %s", name, value);
     }
