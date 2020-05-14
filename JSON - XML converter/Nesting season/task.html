@@ -57,13 +57,15 @@ attributeN = valueN</code></pre>
 
 <p>Also, you should not rely on new lines, because it's only for better reading by a human. Take a look at the last output example - initial XML file doesn't contain any new lines - everything on a single line although the content is equal to the pre-last example.</p>
 
-<p>You should read from the file named <code>test.txt</code>. If you want to test your program, you should check it on some other file, because the contents of this file will be overwritten during testing and after testing the file will be deleted.</p>
+<p>You should read from the file named <code class="language-xml">test.txt</code>. If you want to test your program, you
+    should check it on some other file, because the contents of this file will be overwritten during testing and after
+    testing the file will be deleted.</p>
 
 <h2>Examples</h2>
 
 <p><strong>Example 1:</strong></p>
 
-<p>Input example #1 (file <code>test.txt</code>)</p>
+<p>Input example #1 (file <code class="language-xml">test.txt</code>)</p>
 
 <pre><code class="language-xml">&lt;transaction&gt;
     &lt;id&gt;6753322&lt;/id&gt;
@@ -161,7 +163,7 @@ year = "2018"</code></pre>
 
 <p><strong>Example 2:</strong></p>
 
-<p>Input example #2 (file <code>test.txt</code>)</p>
+<p>Input example #2 (file <code class="language-xml">test.txt</code>)</p>
 
 <pre><code class="language-xml">&lt;node&gt;
     &lt;child name = "child_name1" type = "child_type1"&gt;
@@ -231,7 +233,7 @@ auth = "auth3"</code></pre>
 
 <p><strong>Example 3:</strong></p>
 
-<p>Input example #3 (file <code>test.txt</code>)</p>
+<p>Input example #3 (file <code class="language-xml">test.txt</code>)</p>
 
 <pre><code class="language-xml">&lt;node&gt;&lt;child name="child_name1" type="child_type1"&gt;&lt;subchild id="1" auth="auth1"&gt;Value1&lt;/subchild&gt;&lt;/child&gt;&lt;child name="child_name2" type="child_type2"&gt;&lt;subchild id="2" auth="auth1"&gt;Value2&lt;/subchild&gt;&lt;subchild id="3" auth="auth2"&gt;Value3&lt;/subchild&gt;&lt;subchild id="4" auth="auth3"&gt;&lt;/subchild&gt;&lt;subchild id="5" auth="auth3"/&gt;&lt;/child&gt;&lt;/node&gt;</code></pre>
 

@@ -6,9 +6,9 @@ files:
   text: |
     import com.google.gson.*;
     import converter.Main;
-    import org.hyperskill.hstest.v6.stage.BaseStageTest;
-    import org.hyperskill.hstest.v6.testcase.CheckResult;
-    import org.hyperskill.hstest.v6.testcase.TestCase;
+    import org.hyperskill.hstest.stage.StageTest;
+    import org.hyperskill.hstest.testcase.CheckResult;
+    import org.hyperskill.hstest.testcase.TestCase;
 
     import org.w3c.dom.*;
 
@@ -28,8 +28,8 @@ files:
         }
     }
 
-    public class ConverterTest extends BaseStageTest<Clue> {
-        public ConverterTest() throws Exception {
+    public class ConverterTest extends StageTest<Clue> {
+        public ConverterTest() {
             super(Main.class);
         }
 
@@ -1127,7 +1127,7 @@ files:
             }
 
             if (!e1.hasChildNodes()) {
-                return CheckResult.TRUE;
+                return CheckResult.correct();
             }
 
             NodeList childs1 = e1.getChildNodes();
@@ -1167,7 +1167,7 @@ files:
                 }
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
         public static JsonElement stringToJSON(String str) {
@@ -1197,7 +1197,7 @@ files:
                         "(or vice versa)");
             }
             if (e1.isJsonNull()) {
-                return CheckResult.TRUE;
+                return CheckResult.correct();
             }
 
 
@@ -1241,7 +1241,7 @@ files:
                 return compareJSONObjects(obj1, obj2);
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
 
@@ -1289,7 +1289,7 @@ files:
                         "found boolean (or vice versa)");
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
         public static CheckResult compareJSONArrays(JsonArray arr1, JsonArray arr2) {
@@ -1308,7 +1308,7 @@ files:
                 }
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
         public static CheckResult compareJSONObjects(JsonObject obj1, JsonObject obj2) {
@@ -1329,22 +1329,371 @@ files:
                 }
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
     }
   learner_created: false
-- name: src/converter/Main.java
+- name: src/converter/xml/XmlAttribute.java
   visible: true
   text: |
-    package converter;
+    package converter.xml;
 
-    public class Main {
-        public static void main(String[] args) {
-            System.out.println("Hello World!");
+    public class XmlAttribute {
+        protected final String name;
+        protected final String value;
+
+        public XmlAttribute(String name) {
+            this(name, null);
+        }
+
+        public XmlAttribute(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value == null ? name : String.format("%s=\"%s\"", name, value);
         }
     }
   learner_created: false
+- name: src/converter/xml/XmlElement.java
+  visible: true
+  text: |
+    package converter.xml;
+
+    public class XmlElement extends XmlComplexValue {
+        protected final String name;
+        protected final XmlAttributes attributes;
+        protected final XmlValue value;
+
+        public XmlElement(String name) {
+            this(name, null, null);
+        }
+
+        public XmlElement(String name, XmlAttributes attributes) {
+            this(name, attributes, null);
+        }
+
+        public XmlElement(String name, XmlValue value) {
+            this(name, null, value);
+        }
+
+        public XmlElement(String name, XmlAttributes attributes, XmlValue value) {
+            this.name = name;
+            this.attributes = attributes;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            if (attributes == null && value == null) {
+                return String.format("<%s/>", name);
+            } else if (value == null) {
+                return String.format("<%s %s/>", name, attributes);
+            } else if (attributes == null) {
+                return String.format("<%s>%s</%s>", name, value, name);
+            } else {
+                return String.format("<%s %s>%s</%s>", name, attributes, value, name);
+            }
+        }
+    }
+  learner_created: false
+- name: src/converter/json/JsonValue.java
+  visible: true
+  text: |
+    package converter.json;
+
+    import converter.Pretty;
+
+    public abstract class JsonValue implements Pretty {
+        @Override
+        public String toPretty() {
+            return toString();
+        }
+
+        public boolean isSimple() {
+            return true;
+        }
+    }
+  learner_created: false
+- name: src/converter/json/JsonEntity.java
+  visible: true
+  text: |
+    package converter.json;
+
+    import converter.Pretty;
+
+    public class JsonEntity implements Pretty {
+        protected final String name;
+        protected final JsonValue value;
+
+        public JsonEntity(String name, JsonValue value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        @Override
+        public String toPretty() {
+            return String.format("\"%s\": %s", name, value.toPretty());
+        }
+
+        @Override
+        public String toString() {
+            return String.format("\"%s\": %s", name, value);
+        }
+    }
+  learner_created: false
+- name: src/converter/json/JsonParser.java
+  visible: true
+  text: |
+    package converter.json;
+
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+
+    public class JsonParser {
+        protected static final Pattern NAME_PATTERN = Pattern.compile("\\s*\"[^\"]*\"\\s*:\\s*");
+        protected static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+(\\.\\d+)?");
+        protected static final String NULL = "null";
+        protected static final String TRUE = "true";
+        protected static final String FALSE = "false";
+        protected static final char OPENING_BRACE = '{';
+        protected static final char CLOSING_BRACE = '}';
+        protected static final char QUOTE = '"';
+        protected static final char OPENING_SQUARE_BRACKET = '[';
+        protected static final char CLOSING_SQUARE_BRACKET = ']';
+
+        public JsonObject parse(String input) {
+            final List<EntityRaw> raw = raw(input);
+            return convert(raw);
+        }
+
+        protected List<EntityRaw> raw(String input) {
+            final List<EntityRaw> rawList = new ArrayList<>();
+            final String target = getValueFromBraces(input);
+            final Matcher matcher = NAME_PATTERN.matcher(target);
+            int index = 0;
+            while (matcher.find(index)) {
+                final RawType type;
+                final String name = getValueFromQuotes(matcher.group());
+                final int valueBegin = matcher.end() + 1;
+                final int valueEnd;
+                final char ch = input.charAt(valueBegin);
+                if (ch == OPENING_BRACE) {
+                    type = RawType.OBJECT;
+                    int opened = 0;
+                    int closed = 0;
+                    int currentIndex = valueBegin + 1;
+                    while (true) {
+                        final int openedIndex = input.indexOf(OPENING_BRACE, currentIndex);
+                        final int closingIndex = input.indexOf(CLOSING_BRACE, currentIndex);
+                        if (openedIndex == -1 || openedIndex > closingIndex) {
+                            if (opened == closed) {
+                                valueEnd = closingIndex + 1;
+                                break;
+                            }
+                            closed++;
+                            currentIndex = closingIndex + 1;
+                        } else {
+                            opened++;
+                            currentIndex = openedIndex + 1;
+                        }
+                    }
+                } else if (ch == QUOTE) {
+                    type = RawType.STRING;
+                    valueEnd = input.indexOf(QUOTE, valueBegin + 1) + 1;
+                } else if (ch == NULL.charAt(0)) {
+                    type = RawType.NULL;
+                    valueEnd = valueBegin + NULL.length();
+                } else if (ch == TRUE.charAt(0)) {
+                    type = RawType.BOOLEAN;
+                    valueEnd = valueBegin + TRUE.length();
+                } else if (ch == FALSE.charAt(0)) {
+                    type = RawType.BOOLEAN;
+                    valueEnd = valueBegin + FALSE.length();
+                } else if (Character.isDigit(ch)) {
+                    type = RawType.NUMBER;
+                    final Matcher numberMatcher = NUMBER_PATTERN.matcher(input);
+                    if (numberMatcher.find(valueBegin)) {
+                        valueEnd = numberMatcher.end();
+                    } else {
+                        throw new IllegalArgumentException("Unknown number starting character: " + ch);
+                    }
+                } else if (ch == OPENING_SQUARE_BRACKET) {
+                    type = RawType.ARRAY;
+                    valueEnd = input.indexOf(CLOSING_SQUARE_BRACKET, valueBegin) + 1;
+                } else {
+                    throw new IllegalArgumentException("Unknown value starting character: " + ch);
+                }
+                final String value = input.substring(valueBegin, valueEnd);
+                rawList.add(new EntityRaw(type, name, value));
+                if (valueEnd == input.length() - 1) {
+                    break;
+                }
+                index = valueEnd;
+            }
+            return rawList;
+        }
+
+        protected JsonObject convert(List<EntityRaw> rawList) {
+            final ArrayList<JsonEntity> entities = new ArrayList<>(rawList.size());
+            for (EntityRaw raw : rawList) {
+                final JsonValue value;
+                if (raw.type == RawType.OBJECT) {
+                    value = convert(raw(raw.value));
+                } else if (raw.type == RawType.STRING) {
+                    value = new JsonString(getValueFromQuotes(raw.value));
+                } else if (raw.type == RawType.NULL) {
+                    value = new JsonNull();
+                } else if (raw.type == RawType.BOOLEAN) {
+                    value = new JsonBoolean("true".equals(raw.value));
+                } else if (raw.type == RawType.NUMBER) {
+                    value = raw.value.contains(".")
+                            ? new JsonDouble(Double.parseDouble(raw.value))
+                            : new JsonInteger(Integer.parseInt(raw.value));
+                } else if (raw.type == RawType.ARRAY) {
+                    throw new UnsupportedOperationException("Array is unsupported");
+                } else {
+                    throw new IllegalArgumentException("Unknown raw type: " + raw.type);
+                }
+                entities.add(new JsonEntity(raw.name, value));
+            }
+            return new JsonObject(entities);
+        }
+
+        protected String getValueFromBraces(String input) {
+            return input.substring(input.indexOf("{") + 1, input.lastIndexOf("}"));
+        }
+
+        protected String getValueFromQuotes(String input) {
+            final int nameBegin = input.indexOf(QUOTE) + 1;
+            final int nameEnd = input.indexOf(QUOTE, nameBegin);
+            return input.substring(nameBegin, nameEnd);
+        }
+
+        protected enum RawType {
+            OBJECT,
+            STRING,
+            NULL,
+            BOOLEAN,
+            NUMBER,
+            ARRAY
+        }
+
+        protected static class EntityRaw {
+            final RawType type;
+            final String name;
+            final String value;
+
+            public EntityRaw(RawType type, String name, String value) {
+                this.type = type;
+                this.name = name;
+                this.value = value;
+            }
+
+        }
+    }
+  learner_created: false
+- name: src/converter/xml/XmlValue.java
+  visible: true
+  text: |
+    package converter.xml;
+
+    public abstract class XmlValue {
+    }
+  learner_created: false
+- name: src/converter/xml/XmlSimpleValue.java
+  visible: true
+  text: |
+    package converter.xml;
+
+    public class XmlSimpleValue extends XmlValue {
+        protected final String value;
+
+        public XmlSimpleValue() {
+            this("");
+        }
+
+        public XmlSimpleValue(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+  learner_created: false
+- name: src/converter/Parser.java
+  visible: true
+  learner_created: true
+- name: src/converter/json/JsonBoolean.java
+  visible: true
+  learner_created: true
+- name: src/converter/xml/XmlElements.java
+  visible: true
+  learner_created: true
+- name: src/converter/json/Json2XmlConverter.java
+  visible: true
+  learner_created: true
+- name: src/converter/json/JsonArray.java
+  visible: true
+  learner_created: true
+- name: src/converter/Main.java
+  visible: true
+  learner_created: true
+- name: src/converter/Subject.java
+  visible: true
+  learner_created: true
+- name: src/converter/Pretty.java
+  visible: true
+  learner_created: true
+- name: src/converter/Type.java
+  visible: true
+  learner_created: true
+- name: src/converter/json/JsonNumber.java
+  visible: true
+  learner_created: true
+- name: src/converter/xml/XmlAttributes.java
+  visible: true
+  learner_created: true
+- name: src/converter/xml/XmlPrinter.java
+  visible: true
+  learner_created: true
+- name: src/converter/xml/XmlParser.java
+  visible: true
+  learner_created: true
 - name: src/converter/json/JsonPrimitive.java
+  visible: true
+  learner_created: true
+- name: src/converter/json/JsonInteger.java
+  visible: true
+  learner_created: true
+- name: src/converter/xml/XmlComplexValue.java
+  visible: true
+  learner_created: true
+- name: src/converter/json/JsonPrinter.java
+  visible: true
+  learner_created: true
+- name: src/converter/json/JsonObject.java
+  visible: true
+  learner_created: true
+- name: src/converter/json/JsonNull.java
+  visible: true
+  learner_created: true
+- name: src/converter/json/JsonString.java
+  visible: true
+  learner_created: true
+- name: src/converter/json/JsonDouble.java
+  visible: true
+  learner_created: true
+- name: src/converter/Converter.java
+  visible: true
+  learner_created: true
+- name: src/converter/xml/Xml2JsonConverter.java
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/projects/61/stages/334/implement

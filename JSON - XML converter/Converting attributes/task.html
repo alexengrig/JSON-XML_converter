@@ -17,7 +17,10 @@
 
 <p> </p>
 
-<p>There aren’t attributes in JSON, but as we write a converter, we need a way to interpret XML attributes. Let's say that an attribute in JSON has <code>"@attribute_name": "attribute_value"</code> form. If the element has attributes and has a value inside, you should add #element to element content as the key. See the examples below:</p>
+<p>There aren’t attributes in JSON, but as we write a converter, we need a way to interpret XML attributes. Let's say
+    that an attribute in JSON has <code class="language-xml">"@attribute_name": "attribute_value"</code> form. If the
+    element has attributes and has a value inside, you should add #element to element content as the key. See the
+    examples below:</p>
 
 <pre><code class="language-xml">&lt;element attribute1 = "attribute1_value" … attributeN= "attributeN_value"&gt;content&lt;/element&gt;</code></pre>
 
@@ -39,13 +42,15 @@
 
 <p>Note that you <strong>do not need</strong> to output JSON or XML in a formatted form. You can print them in one line. Because grader deletes all unnecessary whitespace characters before checking.</p>
 
-<p>You should read from the file named <code>test.txt</code>. If you want to test your program, you should check it on some other file, because the contents of this file will be overwritten during testing and after testing the file will be deleted.</p>
+<p>You should read from the file named <code class="language-xml">test.txt</code>. If you want to test your program, you
+    should check it on some other file, because the contents of this file will be overwritten during testing and after
+    testing the file will be deleted.</p>
 
 <h2>Examples</h2>
 
 <p><strong>Example 1:</strong></p>
 
-<p>Sample input #1 (file <code>test.txt</code>)</p>
+<p>Sample input #1 (file <code class="language-xml">test.txt</code>)</p>
 
 <pre><code class="language-xml">&lt;employee department = "manager"&gt;Garry Smith&lt;/employee&gt;</code></pre>
 
@@ -60,7 +65,7 @@
 
 <p><strong>Example 2:</strong></p>
 
-<p>Sample input #2 (file <code>test.txt</code>)</p>
+<p>Sample input #2 (file <code class="language-xml">test.txt</code>)</p>
 
 <pre><code class="language-xml">&lt;person rate = "1" name = "Torvalds" /&gt;</code></pre>
 
@@ -76,7 +81,7 @@
 
 <p><strong>Example 3:</strong></p>
 
-<p>Sample input #3 (file <code>test.txt</code>)</p>
+<p>Sample input #3 (file <code class="language-xml">test.txt</code>)</p>
 
 <pre><code class="language-json">{
     "employee" : {
@@ -91,7 +96,7 @@
 
 <p><strong>Example 4:</strong></p>
 
-<p>Sample input #4 (file <code>test.txt</code>)</p>
+<p>Sample input #4 (file <code class="language-xml">test.txt</code>)</p>
 
 <pre><code class="language-json">{
     "person" : {
@@ -107,7 +112,7 @@
 
 <p><strong>Example 5: </strong></p>
 
-<p>Sample input #5 (file <code>test.txt</code>)</p>
+<p>Sample input #5 (file <code class="language-xml">test.txt</code>)</p>
 
 <pre><code class="language-xml">&lt;host&gt;127.0.0.1&lt;/host&gt;</code></pre>
 
@@ -117,7 +122,7 @@
 
 <p><strong>Example 6:</strong></p>
 
-<p>Sample input #6 (file <code>test.txt</code>)</p>
+<p>Sample input #6 (file <code class="language-xml">test.txt</code>)</p>
 
 <pre><code class="language-json">{"jdk" : "1.8.9"}</code></pre>
 

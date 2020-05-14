@@ -16,9 +16,9 @@ files:
   visible: false
   text: |
     import converter.Main;
-    import org.hyperskill.hstest.v6.stage.BaseStageTest;
-    import org.hyperskill.hstest.v6.testcase.CheckResult;
-    import org.hyperskill.hstest.v6.testcase.TestCase;
+    import org.hyperskill.hstest.stage.StageTest;
+    import org.hyperskill.hstest.testcase.CheckResult;
+    import org.hyperskill.hstest.testcase.TestCase;
 
     import java.util.ArrayList;
     import java.util.List;
@@ -46,7 +46,7 @@ files:
         }
     }
 
-    public class ConverterTest extends BaseStageTest<Clue> {
+    public class ConverterTest extends StageTest<Clue> {
         public ConverterTest() throws Exception {
             super(Main.class);
         }
@@ -95,7 +95,7 @@ files:
             String userAnswer = reply.replaceAll("\\s+", "");
 
             if (userAnswer.equals(clue.answer)) {
-                return CheckResult.TRUE;
+                return CheckResult.correct();
             }
 
             return new CheckResult(false, clue.getFeedback(userAnswer));
@@ -105,4 +105,4 @@ files:
   learner_created: false
 feedback_link: https://hyperskill.org/projects/61/stages/329/implement
 status: Solved
-record: 1
+record: 5

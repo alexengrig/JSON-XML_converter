@@ -1,16 +1,18 @@
 import com.google.gson.*;
 import converter.Main;
-import org.hyperskill.hstest.v6.stage.BaseStageTest;
-import org.hyperskill.hstest.v6.testcase.CheckResult;
-import org.hyperskill.hstest.v6.testcase.TestCase;
-
+import org.hyperskill.hstest.stage.StageTest;
+import org.hyperskill.hstest.testcase.CheckResult;
+import org.hyperskill.hstest.testcase.TestCase;
 import org.w3c.dom.*;
 
-import javax.xml.parsers.*;
-import java.io.*;
-
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 class Clue {
     String answer;
@@ -22,8 +24,8 @@ class Clue {
     }
 }
 
-public class ConverterTest extends BaseStageTest<Clue> {
-    public ConverterTest() throws Exception {
+public class ConverterTest extends StageTest<Clue> {
+    public ConverterTest() {
         super(Main.class);
     }
 
@@ -33,7 +35,7 @@ public class ConverterTest extends BaseStageTest<Clue> {
         allTests = new LinkedHashMap<>();
 
         allTests.put(
-            "{\n" +
+                "{\n" +
                 "    \"transactions\": {\n" +
                 "        \"id\": \"6753322\",\n" +
                 "        \"data\": [\n" +
@@ -1121,7 +1123,7 @@ public class ConverterTest extends BaseStageTest<Clue> {
         }
 
         if (!e1.hasChildNodes()) {
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
         NodeList childs1 = e1.getChildNodes();
@@ -1161,7 +1163,7 @@ public class ConverterTest extends BaseStageTest<Clue> {
             }
         }
 
-        return CheckResult.TRUE;
+        return CheckResult.correct();
     }
 
     public static JsonElement stringToJSON(String str) {
@@ -1191,7 +1193,7 @@ public class ConverterTest extends BaseStageTest<Clue> {
                     "(or vice versa)");
         }
         if (e1.isJsonNull()) {
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
 
@@ -1235,7 +1237,7 @@ public class ConverterTest extends BaseStageTest<Clue> {
             return compareJSONObjects(obj1, obj2);
         }
 
-        return CheckResult.TRUE;
+        return CheckResult.correct();
     }
 
 
@@ -1283,7 +1285,7 @@ public class ConverterTest extends BaseStageTest<Clue> {
                     "found boolean (or vice versa)");
         }
 
-        return CheckResult.TRUE;
+        return CheckResult.correct();
     }
 
     public static CheckResult compareJSONArrays(JsonArray arr1, JsonArray arr2) {
@@ -1302,7 +1304,7 @@ public class ConverterTest extends BaseStageTest<Clue> {
             }
         }
 
-        return CheckResult.TRUE;
+        return CheckResult.correct();
     }
 
     public static CheckResult compareJSONObjects(JsonObject obj1, JsonObject obj2) {
@@ -1323,6 +1325,6 @@ public class ConverterTest extends BaseStageTest<Clue> {
             }
         }
 
-        return CheckResult.TRUE;
+        return CheckResult.correct();
     }
 }

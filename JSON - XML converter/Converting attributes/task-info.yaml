@@ -6,9 +6,9 @@ files:
   text: |
     import com.google.gson.*;
     import converter.Main;
-    import org.hyperskill.hstest.v6.stage.BaseStageTest;
-    import org.hyperskill.hstest.v6.testcase.CheckResult;
-    import org.hyperskill.hstest.v6.testcase.TestCase;
+    import org.hyperskill.hstest.stage.StageTest;
+    import org.hyperskill.hstest.testcase.CheckResult;
+    import org.hyperskill.hstest.testcase.TestCase;
 
     import org.w3c.dom.*;
 
@@ -36,7 +36,7 @@ files:
         }
     }
 
-    public class ConverterTest extends BaseStageTest<Clue> {
+    public class ConverterTest extends StageTest<Clue> {
         public ConverterTest() throws Exception {
             super(Main.class);
         }
@@ -244,7 +244,7 @@ files:
             }
 
             if (!e1.hasChildNodes()) {
-                return CheckResult.TRUE;
+                return CheckResult.correct();
             }
 
             NodeList childs1 = e1.getChildNodes();
@@ -284,7 +284,7 @@ files:
                 }
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
         public JsonElement stringToJSON(String str) {
@@ -314,7 +314,7 @@ files:
                         "(or vice versa)");
             }
             if (e1.isJsonNull()) {
-                return CheckResult.TRUE;
+                return CheckResult.correct();
             }
 
 
@@ -358,7 +358,7 @@ files:
                 return compareJSONObjects(obj1, obj2);
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
 
@@ -406,7 +406,7 @@ files:
                         "found boolean (or vice versa)");
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
         public CheckResult compareJSONArrays(JsonArray arr1, JsonArray arr2) {
@@ -425,7 +425,7 @@ files:
                 }
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
         public CheckResult compareJSONObjects(JsonObject obj1, JsonObject obj2) {
@@ -446,61 +446,82 @@ files:
                 }
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
     }
   learner_created: false
-- name: src/converter/Element.java
-  visible: true
-  learner_created: true
-- name: src/converter/Attribute.java
-  visible: true
-  learner_created: true
-- name: src/converter/json/JsonElement.java
-  visible: true
-  learner_created: true
-- name: src/converter/xml/XmlAttribute.java
-  visible: true
-  learner_created: true
-- name: src/converter/xml/XmlElement.java
-  visible: true
-  learner_created: true
-- name: src/converter/json/JsonValue.java
-  visible: true
-  learner_created: true
-- name: src/converter/json/JsonSimpleValue.java
-  visible: true
-  learner_created: true
-- name: src/converter/json/JsonElementValue.java
-  visible: true
-  learner_created: true
-- name: src/converter/json/JsonEntity.java
-  visible: true
-  learner_created: true
-- name: src/converter/xml/XmlParser.java
-  visible: true
-  learner_created: true
-- name: src/converter/xml/XmlConverter.java
-  visible: true
-  learner_created: true
 - name: src/converter/Main.java
   visible: true
   text: |
     package converter;
 
+    import java.util.Scanner;
+
     public class Main {
         public static void main(String[] args) {
-            System.out.println("Hello World!");
+            final Scanner scanner = new Scanner(System.in);
+            final String input = scanner.nextLine();
+            try {
+                String output;
+                if (isXML(input)) {
+                    output = toJSON(input);
+                } else if (isJSON(input)) {
+                    output = toXML(input);
+                } else {
+                    throw new IllegalArgumentException("Unknown type");
+                }
+                System.out.println(output);
+            } catch (Exception e) {
+                System.out.println(input);
+            }
+        }
+
+        private static boolean isJSON(String input) {
+            return input.startsWith("{");
+        }
+
+        private static boolean isEmptyJSON(String input) {
+            return input.contains("null");
+        }
+
+        private static String toJSON(String input) {
+            if (isEmptyXML(input)) {
+                final int tagEndIndex = input.indexOf("/>");
+                final String tag = input.substring(1, tagEndIndex).trim();
+                return "{\"" + tag + "\":null}";
+            } else {
+                final int openTagEndIndex = input.indexOf(">");
+                final String tag = input.substring(1, openTagEndIndex);
+                final int closeTagBeginIndex = input.indexOf("</");
+                final String content = input.substring(openTagEndIndex + 1, closeTagBeginIndex);
+                return "{\"" + tag + "\":\"" + content + "\"}";
+            }
+        }
+
+        private static boolean isXML(String input) {
+            return input.startsWith("<");
+        }
+
+        private static boolean isEmptyXML(String input) {
+            return input.contains("/>");
+        }
+
+        private static String toXML(String input) {
+            final int keyBeginIndex = input.indexOf("\"");
+            final int keyEndIndex = input.indexOf("\"", keyBeginIndex + 1);
+            final String key = input.substring(keyBeginIndex + 1, keyEndIndex);
+            if (isEmptyJSON(input)) {
+                return "<" + key + "/>";
+            } else {
+                final int valueBeginIndex = input.indexOf("\"", keyEndIndex + 1);
+                final int valueEndIndex = input.indexOf("\"", valueBeginIndex + 1);
+                final String value = input.substring(valueBeginIndex + 1, valueEndIndex);
+                return "<" + key + ">" + value + "</" + key + ">";
+            }
         }
     }
   learner_created: false
-- name: src/converter/json/JsonParser.java
-  visible: true
-  learner_created: true
-- name: src/converter/json/JsonConverter.java
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/projects/61/stages/330/implement
 status: Solved
-record: 3
+record: 2

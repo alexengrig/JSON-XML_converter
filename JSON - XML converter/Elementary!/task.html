@@ -26,13 +26,20 @@ XML contains data in hierarchy order.</p>
     &lt;/book&gt;
 &lt;/bookstore&gt;</code></pre>
 
-<p>You can look at <a href="https://searchmicroservices.techtarget.com/definition/XML-Extensible-Markup-Language" rel="nofollow noopener noreferrer">this</a> link to find out more about XML.</p>
+<p>You can look at <a href="https://searchmicroservices.techtarget.com/definition/XML-Extensible-Markup-Language"
+                      rel="nofollow noopener noreferrer" target="_blank">this</a> link to find out more about XML.</p>
 
 <p>Now, let's look at JSON.</p>
 
 <p><strong>JSON</strong> stands for JavaScript Object Notation.</p>
 
-<p>JSON is a very flexible format. It has arrays, objects, strings, numbers, booleans, and null. An array looks like this: <code class="language-json">[ e1 , e2 , e3 , ... ]</code>. Types of elements in arrays may be not the same. An object looks like this: <code class="language-json">{ k1 : v1 , k2 : v2 , ... }</code>. This is a map where a key is a string type and the value can be any type. One key corresponds to only one value. A key and a value are separated by a colon, and different key-value pairs are separated by a comma. You can learn more about JSON format <a href="https://www.quackit.com/json/tutorial/what_is_json.cfm" rel="nofollow noopener noreferrer">here</a>.</p>
+<p>JSON is a very flexible format. It has arrays, objects, strings, numbers, booleans, and null. An array looks like
+    this: <code class="language-json">[ e1 , e2 , e3 , ... ]</code>. Types of elements in arrays may be not the same. An
+    object looks like this: <code class="language-json">{ k1 : v1 , k2 : v2 , ... }</code>. This is a map where a key is
+    a string type and the value can be any type. One key corresponds to only one value. A key and a value are separated
+    by a colon, and different key-value pairs are separated by a comma. You can learn more about JSON format <a
+            href="https://www.quackit.com/json/tutorial/what_is_json.cfm" rel="nofollow noopener noreferrer"
+            target="_blank">here</a>.</p>
 
 <p>Example of JSON :</p>
 
@@ -57,12 +64,17 @@ Extract element content and enclose it within double quotes. If element is empty
 <p><strong>Conversion of JSON to XML:</strong></p>
 
 <p>Extract key between double quotes - XML element.<br>
-Extract element content from JSON value.<br>
-If value is not null, enclose JSON with <code>&lt;&gt;&lt;/&gt;</code>, else enclose within <code>&lt; /&gt;</code>.</p>
+    Extract element content from JSON value.<br>
+    If value is not null, enclose JSON with <code class="language-xml">&lt;&gt;&lt;/&gt;</code>, else enclose within
+    <code class="language-xml">&lt; /&gt;</code>.</p>
 
 <p>Write a program that reads XML/JSON from standard input and output the converted XML/JSON.</p>
 
-<p>If the first non-space character of the input is <code>&lt;</code> then this is an XML document, and you need to convert it into JSON. Otherwise, the first non-space character would be <code>{</code> and you need to convert this JSON into an XML. Before checking, the grader deletes all spaces and newline characters so you can output it pretty much as you wish. Try to output this in as readable a format as you can.</p>
+<p>If the first non-space character of the input is <code class="language-xml">&lt;</code> then this is an XML document,
+    and you need to convert it into JSON. Otherwise, the first non-space character would be <code
+            class="language-xml">{</code> and you need to convert this JSON into an XML. Before checking, the grader
+    deletes all spaces and newline characters so you can output it pretty much as you wish. Try to output this in as
+    readable a format as you can.</p>
 
 <h2>Examples</h2>
 

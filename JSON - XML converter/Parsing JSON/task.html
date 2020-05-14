@@ -22,7 +22,8 @@
 
 <p>The algorithm for traversing JSON is similar to traversing XML.</p>
 
-<p>Let’s add some magic constants <code>@</code> and <code>#</code> to to represent attributes and values. Now the JSON tree would look like this:</p>
+<p>Let’s add some magic constants <code class="language-json">@</code> and <code class="language-json">#</code> to to
+    represent attributes and values. Now the JSON tree would look like this:</p>
 
 <pre><code class="language-json">{
     "key": {
@@ -44,55 +45,101 @@
     }
 }</code></pre>
 
-<p>Parsing JSON attributes is different from parsing XML. As you can see, every attribute and corresponding value can be presented as child_nodes for every element. That means you just need to expand your traversal of the JSON tree by checking if its subchildren start with <code>@</code> or <code>#</code>.</p>
+<p>Parsing JSON attributes is different from parsing XML. As you can see, every attribute and corresponding value can be
+    presented as child_nodes for every element. That means you just need to expand your traversal of the JSON tree by
+    checking if its subchildren start with <code class="language-json">@</code> or <code class="language-json">#</code>.
+</p>
 
-<p>But there is a problem: what would you do if the value contains keys that start with <code>@</code> but there are no keys that start with <code>#</code>? Similarly, what should you do if the value contains keys that start with <code>#</code> along with keys that start with <code>@</code> but there are also keys that start with something else?</p>
+<p>But there is a problem: what would you do if the value contains keys that start with <code
+        class="language-json">@</code> but there are no keys that start with <code class="language-json">#</code>?
+    Similarly, what should you do if the value contains keys that start with <code class="language-json">#</code> along
+    with keys that start with <code class="language-json">@</code> but there are also keys that start with something
+    else?</p>
 
-<p>In these cases, you should forget about the special meaning of <code>@</code> and <code>#</code> in front of a key and look at them as regular keys with regular values. You should remove <code>@</code> and <code>#</code> from the key as these symbols are not allowed in the XML tag names.</p>
+<p>In these cases, you should forget about the special meaning of <code class="language-json">@</code> and <code
+        class="language-json">#</code> in front of a key and look at them as regular keys with regular values. You
+    should remove <code class="language-json">@</code> and <code class="language-json">#</code> from the key as these
+    symbols are not allowed in the XML tag names.</p>
 
-<p>Also, if the key contains only the <code>@</code> symbol, then it's not considered a special key representing an attribute.</p>
+<p>Also, if the key contains only the <code class="language-json">@</code> symbol, then it's not considered a special
+    key representing an attribute.</p>
 
-<p>For the keys, that lost their meaning due to some errors you should omit <code>@</code> and <code>#</code> symbols from the start of them as XML elements can't start with these symbols. If there are <code>@key</code> and <code>key</code> in the object you should prefer the key without <code>@</code> symbol.</p>
+<p>For the keys, that lost their meaning due to some errors you should omit <code class="language-json">@</code> and
+    <code class="language-json">#</code> symbols from the start of them as XML elements can't start with these symbols.
+    If there are <code class="language-json">@key</code> and <code class="language-json">key</code> in the object you
+    should prefer the key without <code class="language-json">@</code> symbol.</p>
 
-<p>Also, avoid empty keys. Do not map them to the output as they definitely would break something during conversion to an XML. Keep in mind that if the key contains only the <code>@</code> symbol, then it's not considered a special key representing an attribute and after omitting this symbol key would be empty. Therefore, you shouldn't convert keys <code>@</code> and <code>#</code> also.</p>
+<p>Also, avoid empty keys. Do not map them to the output as they definitely would break something during conversion to
+    an XML. Keep in mind that if the key contains only the <code class="language-json">@</code> symbol, then it's not
+    considered a special key representing an attribute and after omitting this symbol key would be empty. Therefore, you
+    shouldn't convert keys <code class="language-json">@</code> and <code class="language-json">#</code> also.</p>
 
 <p>Also, if the attribute is null, change it to the empty string.</p>
 
 <p>So, in short, you need to consider JSON element as an object with attributes only if:</p>
 
-<p>1. The object has a key with the same name as the object, with a <code>#</code> symbol in front of it. For example, if the key of the object is <code>"obj"</code> then the value of this object <strong>must be inside</strong> <code>"#obj"</code> key inside this object. Note that if such a key does not exist in the object, this object <strong>should not be considered</strong> as a single XML object with attributes.</p>
+<p>1. The object has a key with the same name as the object, with a <code class="language-json">#</code> symbol in front
+    of it. For example, if the key of the object is <code class="language-json">"obj"</code> then the value of this
+    object <strong>must be inside</strong> <code class="language-json">"#obj"</code> key inside this object. Note that
+    if such a key does not exist in the object, this object <strong>should not be considered</strong> as a single XML
+    object with attributes.</p>
 
-<p>2. The <code>value</code> object contains the <code>#value</code> key and <strong>all other attributes</strong> begin with the <code>@</code> symbol and <strong>more than 1 character long</strong>. If this object has at least one key that equals <code>@</code> or does not start with <code>@</code> (except <code>#value</code>), then this object <strong>should not be considered</strong> as a single XML object with attributes.</p>
+<p>2. The <code class="language-json">value</code> object contains the <code class="language-json">#value</code> key and
+    <strong>all other attributes</strong> begin with the <code class="language-json">@</code> symbol and <strong>more
+        than 1 character long</strong>. If this object has at least one key that equals <code
+            class="language-json">@</code> or does not start with <code class="language-json">@</code> (except <code
+            class="language-json">#value</code>), then this object <strong>should not be considered</strong> as a single
+    XML object with attributes.</p>
 
-<p>3. If the value of any key starting with <code>@</code> is not a number, string or null (in other words, <strong>it will be an object</strong> starting with <code>"{"</code>), then this object <strong>cannot be</strong> an attribute of a single XML object and the <code>@</code> symbol should be removed from this key, and thus the object <strong>cannot be considered</strong> a single XML object. </p>
+<p>3. If the value of any key starting with <code class="language-json">@</code> is not a number, string or null (in
+    other words, <strong>it will be an object</strong> starting with <code class="language-json">"{"</code>), then this
+    object <strong>cannot be</strong> an attribute of a single XML object and the <code class="language-json">@</code>
+    symbol should be removed from this key, and thus the object <strong>cannot be considered</strong> a single XML
+    object. </p>
 
-<p>And the object without attributes would look like a standard JSON object, without <code>@</code> or <code>#</code> symbols around. In particular, all wrong cases of creating an object with attributes result in a standard object after certain manipulations. For example <code>inner1</code>, <code>inner2</code> and <code>inner3</code> from the first example are objects without attributes with no errors in construction.</p>
+<p>And the object without attributes would look like a standard JSON object, without <code
+        class="language-json">@</code> or <code class="language-json">#</code> symbols around. In particular, all wrong
+    cases of creating an object with attributes result in a standard object after certain manipulations. For example
+    <code class="language-json">inner1</code>, <code class="language-json">inner2</code> and <code
+            class="language-json">inner3</code> from the first example are objects without attributes with no errors in
+    construction.</p>
 
 <p>Some cases from the first example:</p>
 
-<p>1. <code>inner4</code> contains a key <code>@</code> and it is not an attribute. That's why this object is not considered as a single object with attributes. But since <code>@</code> key is not allowed, this key would be removed and <code>#inner4</code> key will turn into <code>inner4</code> key. After all manipulations, this object will look like this:</p>
+<p>1. <code class="language-json">inner4</code> contains a key <code class="language-json">@</code> and it is not an
+    attribute. That's why this object is not considered as a single object with attributes. But since <code
+            class="language-json">@</code> key is not allowed, this key would be removed and <code
+            class="language-json">#inner4</code> key will turn into <code class="language-json">inner4</code> key. After
+    all manipulations, this object will look like this:</p>
 
 <pre><code class="language-json">"inner4": {
     "inner4": "value3"
 }</code></pre>
 
-<p>Same rules apply to <code>inner4.2</code>.</p>
+<p>Same rules apply to <code class="language-json">inner4.2</code>.</p>
 
-<p>2. <code>inner5</code> contains key <code>#inner4</code> but should contain key <code>#inner5</code> to be a single object with attributes.</p>
+<p>2. <code class="language-json">inner5</code> contains key <code class="language-json">#inner4</code> but should
+    contain key <code class="language-json">#inner5</code> to be a single object with attributes.</p>
 
-<p>3. <code>inner6</code> constructed in the correct way, with <code>#inner6</code> key and an attribute that starts with <code>@</code>. That's why <code>inner6</code> is a valid single XML object with attributes.</p>
+<p>3. <code class="language-json">inner6</code> constructed in the correct way, with <code
+        class="language-json">#inner6</code> key and an attribute that starts with <code class="language-json">@</code>.
+    That's why <code class="language-json">inner6</code> is a valid single XML object with attributes.</p>
 
-<p>4. <code>inner7</code> constructed in the correct way, with <code>#inner7</code> key, just without attributes and that's legal.</p>
+<p>4. <code class="language-json">inner7</code> constructed in the correct way, with <code
+        class="language-json">#inner7</code> key, just without attributes and that's legal.</p>
 
-<p>5. <code>inner8</code> doesn't contain key <code>#inner8</code> and should not be considered as a single XML object with attributes.</p>
+<p>5. <code class="language-json">inner8</code> doesn't contain key <code class="language-json">#inner8</code> and
+    should not be considered as a single XML object with attributes.</p>
 
-<p>6. <code>inner11</code> contains children, all their names are not allowed, so these children will be deleted and <code>inner11</code> will become an empty object. Similar to <code>empty2</code>, the value of this object must be an empty string.</p>
+<p>6. <code class="language-json">inner11</code> contains children, all their names are not allowed, so these children
+    will be deleted and <code class="language-json">inner11</code> will become an empty object. Similar to <code
+            class="language-json">empty2</code>, the value of this object must be an empty string.</p>
 
 <p>All of the variants are described in the output example below.</p>
 
 <p>In this stage you should write a program that reads JSON file from disk, parse and output in this format:</p>
 
-<pre><code>Key:
+<pre><code class="language-json">Key:
 path = super_key … parent_key
 value = value
 attributes : [ if key doesn’t contain attributes skip this ]
@@ -105,7 +152,9 @@ attributeN = attributeN</code></pre>
     &lt;elem3 attr5="val5" attr6="val6"&gt;Value2&lt;/elem2&gt;
 &lt;/elem1&gt;</code></pre>
 
-<p>Take note that element <code>elem1</code> contains attributes, but its value is on another level of complexity - not just a number, null or string. Well, for this you can also use standard rules. See how it should be converted into JSON:</p>
+<p>Take note that element <code class="language-json">elem1</code> contains attributes, but its value is on another
+    level of complexity - not just a number, null or string. Well, for this you can also use standard rules. See how it
+    should be converted into JSON:</p>
 
 <pre><code class="language-json">{
     "elem1": {
@@ -128,13 +177,15 @@ attributeN = attributeN</code></pre>
 
 <p>Also, you should not rely on new lines, because it's only for better reading by a human. Take a look at the last output example - initial JSON file doesn't contain any new lines - everything on a single line although the content is equal to the pre-last example.</p>
 
-<p>You should read from the file named <code>test.txt</code>. If you want to test your program, you should check it on some other file, because the contents of this file will be overwritten during testing and after testing the file will be deleted.</p>
+<p>You should read from the file named <code class="language-json">test.txt</code>. If you want to test your program,
+    you should check it on some other file, because the contents of this file will be overwritten during testing and
+    after testing the file will be deleted.</p>
 
 <h2>Examples</h2>
 
 <p><strong>Example 1:</strong></p>
 
-<p>Input example #1 (file <code>test.txt</code>)</p>
+<p>Input example #1 (file <code class="language-json">test.txt</code>)</p>
 
 <pre><code class="language-json">{
     "transaction": {
@@ -215,7 +266,7 @@ attributeN = attributeN</code></pre>
 
 <p>Output example #1</p>
 
-<pre><code>Element:
+<pre><code class="language-json">Element:
 path = transaction
 
 Element:
@@ -363,7 +414,7 @@ value = "0.01"</code></pre>
 
 <p><strong>Example 2:</strong></p>
 
-<p>Input example #2 (file <code>test.txt</code>)</p>
+<p>Input example #2 (file <code class="language-json">test.txt</code>)</p>
 
 <pre><code class="language-json">{
     "root1": {
@@ -397,7 +448,7 @@ value = "0.01"</code></pre>
 
 <p>Output example #2</p>
 
-<pre><code>Element:
+<pre><code class="language-json">Element:
 path = root1
 attributes:
 attr1 = "val1"
@@ -439,13 +490,13 @@ value = "Value4"</code></pre>
 
 <p><strong>Example 3:</strong></p>
 
-<p>Input example #3 (file <code>test.txt</code>)</p>
+<p>Input example #3 (file <code class="language-json">test.txt</code>)</p>
 
-<pre><code>{"root1":{"@attr1":"val1","@attr2":"val2","#root1":{"elem1":{"@attr3":"val3","@attr4":"val4","#elem1":"Value1"},"elem2":{"@attr5":"val5","@attr6":"val6","#elem2":"Value2"}}},"root2":{"@attr1":null,"@attr2":"","#root2":null},"root3":{"@attr1":"val2","@attr2":"val1","#root3":""},"root4":"Value4"}</code></pre>
+<pre><code class="language-json">{"root1":{"@attr1":"val1","@attr2":"val2","#root1":{"elem1":{"@attr3":"val3","@attr4":"val4","#elem1":"Value1"},"elem2":{"@attr5":"val5","@attr6":"val6","#elem2":"Value2"}}},"root2":{"@attr1":null,"@attr2":"","#root2":null},"root3":{"@attr1":"val2","@attr2":"val1","#root3":""},"root4":"Value4"}</code></pre>
 
 <p>Output example #3</p>
 
-<pre><code>Element:
+<pre><code class="language-json">Element:
 path = root1
 attributes:
 attr1 = "val1"

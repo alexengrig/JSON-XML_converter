@@ -6,9 +6,9 @@ files:
   text: |
     import com.google.gson.*;
     import converter.Main;
-    import org.hyperskill.hstest.v6.stage.BaseStageTest;
-    import org.hyperskill.hstest.v6.testcase.CheckResult;
-    import org.hyperskill.hstest.v6.testcase.TestCase;
+    import org.hyperskill.hstest.stage.StageTest;
+    import org.hyperskill.hstest.testcase.CheckResult;
+    import org.hyperskill.hstest.testcase.TestCase;
 
     import org.w3c.dom.*;
 
@@ -28,8 +28,8 @@ files:
         }
     }
 
-    public class ConverterTest extends BaseStageTest<Clue> {
-        public ConverterTest() throws Exception {
+    public class ConverterTest extends StageTest<Clue> {
+        public ConverterTest() {
             super(Main.class);
         }
 
@@ -705,7 +705,7 @@ files:
             }
 
             if (!e1.hasChildNodes()) {
-                return CheckResult.TRUE;
+                return CheckResult.correct();
             }
 
             NodeList childs1 = e1.getChildNodes();
@@ -745,7 +745,7 @@ files:
                 }
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
         public static JsonElement stringToJSON(String str) {
@@ -775,7 +775,7 @@ files:
                         "(or vice versa)");
             }
             if (e1.isJsonNull()) {
-                return CheckResult.TRUE;
+                return CheckResult.correct();
             }
 
 
@@ -819,7 +819,7 @@ files:
                 return compareJSONObjects(obj1, obj2);
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
 
@@ -867,7 +867,7 @@ files:
                         "found boolean (or vice versa)");
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
         public static CheckResult compareJSONArrays(JsonArray arr1, JsonArray arr2) {
@@ -886,7 +886,7 @@ files:
                 }
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
         public static CheckResult compareJSONObjects(JsonObject obj1, JsonObject obj2) {
@@ -907,9 +907,1414 @@ files:
                 }
             }
 
-            return CheckResult.TRUE;
+            return CheckResult.correct();
         }
 
+    }
+  learner_created: false
+- name: src/converter/xml/XmlAttribute.java
+  visible: true
+  text: |
+    package converter.xml;
+
+    import converter.Attribute;
+
+    public class XmlAttribute extends Attribute {
+        public XmlAttribute(String name) {
+            this(name, null);
+        }
+
+        public XmlAttribute(String name, String value) {
+            super(name, value);
+        }
+
+        @Override
+        public String toString() {
+            if (value == null) {
+                return name;
+            } else {
+                return String.format("%s=\"%s\"", name, value);
+            }
+        }
+    }
+  learner_created: false
+- name: src/converter/xml/XmlElement.java
+  visible: true
+  text: |
+    package converter.xml;
+
+    import converter.Element;
+
+    import java.util.List;
+    import java.util.StringJoiner;
+
+    public class XmlElement extends Element {
+        public final List<XmlAttribute> attributes;
+
+        public XmlElement(String name) {
+            this(name, null, null);
+        }
+
+        public XmlElement(String name, XmlValue value) {
+            this(name, value, null);
+        }
+
+        public XmlElement(String name, List<XmlAttribute> attributes) {
+            this(name, null, attributes);
+        }
+
+        public XmlElement(String name, XmlValue value, List<XmlAttribute> attributes) {
+            super(name, value);
+            this.attributes = attributes;
+        }
+
+        @Override
+        public String toString() {
+            if (value == null && attributes == null) {
+                return String.format("<%s/>", name);
+            } else if (value == null) {
+                final StringJoiner attributeJoiner = new StringJoiner(" ");
+                for (XmlAttribute attribute : attributes) {
+                    attributeJoiner.add(attribute.toString());
+                }
+                return String.format("<%s %s/>", name, attributeJoiner.toString());
+            } else if (attributes == null) {
+                return String.format("<%s>%s</%s>", name, value, name);
+            } else {
+                final StringJoiner attributeJoiner = new StringJoiner(" ");
+                for (XmlAttribute attribute : attributes) {
+                    attributeJoiner.add(attribute.toString());
+                }
+                return String.format("<%s %s>%s</%s>", name, attributeJoiner.toString(), value, name);
+            }
+        }
+    }
+  learner_created: false
+- name: src/converter/json/JsonValue.java
+  visible: true
+  text: |
+    package converter.json;
+
+    public abstract class JsonValue {
+    }
+  learner_created: false
+- name: src/converter/json/JsonEntity.java
+  visible: true
+  text: |-
+    package converter.json;
+
+    public class JsonEntity {
+        public final String name;
+        public final JsonValue value;
+
+        public JsonEntity(String name) {
+            this(name, new JsonSimpleValue());
+        }
+
+        public JsonEntity(String name, String value) {
+            this(name, new JsonSimpleValue(value));
+        }
+
+        public JsonEntity(String name, JsonElement value) {
+            this(name, new JsonElementValue(value));
+        }
+
+        public JsonEntity(String name, JsonValue value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("\"%s\":%s", name, value.toString());
+        }
+    }
+  learner_created: false
+- name: src/converter/xml/XmlConverter.java
+  visible: true
+  text: |
+    package converter.xml;
+
+    import converter.json.JsonElement;
+    import converter.json.JsonEntity;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+    public class XmlConverter {
+        public JsonElement convertToJson(XmlElement element) {
+    //        final String elementName = element.name;
+    //        final String elementValue = element.value;
+    //        final List<XmlAttribute> elementAttributes = element.attributes;
+    //        if (elementAttributes == null) {
+    //            return new JsonElement(elementName, elementValue);
+    //        } else {
+    //            final List<JsonEntity> entities = new ArrayList<>(elementAttributes.size() + 1);
+    //            for (XmlAttribute attribute : elementAttributes) {
+    //                entities.add(new JsonEntity("@" + attribute.name, attribute.value));
+    //            }
+    //            entities.add(new JsonEntity("#" + elementName, elementValue));
+    //            return new JsonElement(elementName, new JsonElement(entities));
+    //        }
+            return null;
+        }
+    }
+  learner_created: false
+- name: src/converter/json/JsonParser.java
+  visible: true
+  text: |
+    package converter.json;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+    public class JsonParser {
+        private static final String NAME_REGEX = "\"[^\"]+\"";
+        private static final String VALUE_REGEX = "null|\\d+|\"[^\"]*\"";
+        private static final String COLON_REGEX = "\\s*:\\s*";
+        private static final String INPUT_REGEX = "^\\{\\s*" + NAME_REGEX + COLON_REGEX +
+                "(" + VALUE_REGEX + "" +
+                "|\\{\\s*" + NAME_REGEX + COLON_REGEX + "(" + VALUE_REGEX + ")" +
+                "(\\s*,\\s*" + NAME_REGEX + COLON_REGEX + "(" + VALUE_REGEX + "))*\\s*})" +
+                "(\\s*,\\s*" + NAME_REGEX + COLON_REGEX +
+                "(" + VALUE_REGEX + "" +
+                "|\\{\\s*" + NAME_REGEX + COLON_REGEX + "(" + VALUE_REGEX + ")" +
+                "(\\s*,\\s*" + NAME_REGEX + COLON_REGEX + "(" + VALUE_REGEX + "))*\\s*}))*" +
+                "\\s*}$";
+
+        public JsonElement parse(String input) {
+            final boolean isValid = input.matches(INPUT_REGEX);
+            if (!isValid) {
+                throw new IllegalArgumentException("No valid input: " + input);
+            }
+            final int colonIndex = input.indexOf(":");
+            final String rawName = input.substring(0, colonIndex);
+            final String elementName = getElementName(rawName);
+            final String rawValue = input.substring(colonIndex + 1).trim();
+            if (rawValue.startsWith("null")) {
+                return new JsonElement(elementName);
+            } else if (rawName.startsWith("\"")) {
+                final int valueEndIndex = rawName.indexOf("\"", 1);
+                final String elementValue = rawValue.substring(1, valueEndIndex);
+                return new JsonElement(elementName, elementValue);
+            } else if (rawName.startsWith("{")) {
+                final String[] chunks = rawValue.replace("{", "").split("\\s*,\\s*");
+                final List<JsonEntity> elementEntities = new ArrayList<>();
+                for (String chunk : chunks) {
+                    final JsonEntity jsonEntity = parseEntity(chunk);
+                    elementEntities.add(jsonEntity);
+                }
+                return new JsonElement(elementName, new JsonElement(elementEntities));
+            } else {
+                throw new IllegalArgumentException("No valid value" + rawValue);
+            }
+        }
+
+        private JsonEntity parseEntity(String input) {
+            final int colonIndex = input.indexOf(":");
+            final String rawName = input.substring(0, colonIndex);
+            final String elementName = getElementName(rawName);
+            final String rawValue = input.substring(colonIndex + 1).trim();
+            if (rawValue.startsWith("null")) {
+                return new JsonEntity(elementName);
+            } else if (rawValue.startsWith("\"")) {
+                final int valueEndIndex = rawValue.indexOf("\"", 1);
+                final String elementValue = rawValue.substring(1, valueEndIndex);
+                return new JsonEntity(elementName, elementValue);
+            } else {
+                return new JsonEntity(elementName, rawValue);
+            }
+        }
+
+        private String getElementName(String input) {
+            final int nameBeginIndex = input.indexOf("\"");
+            final int nameEndIndex = input.indexOf("\"", nameBeginIndex + 1);
+            return input.substring(nameBeginIndex + 1, nameEndIndex);
+        }
+    }
+  learner_created: false
+- name: src/converter/json/JsonConverter.java
+  visible: true
+  text: |
+    package converter.json;
+
+    import converter.json.JsonElement;
+    import converter.json.JsonElementValue;
+    import converter.json.JsonEntity;
+    import converter.json.JsonSimpleValue;
+    import converter.xml.XmlAttribute;
+    import converter.xml.XmlElement;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+    public class JsonConverter {
+        public XmlElement convert(JsonElement element) {
+    //        final List<JsonEntity> entities = element.entities;
+    //        final JsonEntity entity = entities.get(0);
+    //        if (entity.value == null) {
+    //            return new XmlElement(entity.name);
+    //        } else if (entity.value instanceof JsonSimpleValue) {
+    //            final JsonSimpleValue jsonValue = (JsonSimpleValue) entity.value;
+    //            return new XmlElement(entity.name, jsonValue.value);
+    //        } else {
+    //            final JsonElementValue attributeValue = (JsonElementValue) entity.value;
+    //            final List<XmlAttribute> attributes = new ArrayList<>();
+    //            String elementValue = null;
+    //            for (JsonEntity valueEntity : attributeValue.value.entities) {
+    //                final String entityName = valueEntity.name;
+    //                final JsonSimpleValue entityValue = (JsonSimpleValue) valueEntity.value;
+    //                if (entityName.startsWith("@")) {
+    //                    attributes.add(new XmlAttribute(entityName.substring(1), entityValue.value));
+    //                } else if (entityName.startsWith("#")) {
+    //                    elementValue = entityValue.value;
+    //                }
+    //            }
+    //            return new XmlElement(entity.name, elementValue, attributes);
+    //        }
+            return null;
+        }
+    }
+  learner_created: false
+- name: src/converter/js/JsNull.java
+  visible: true
+  text: |
+    package converter.js;
+
+    public class JsNull extends JsValue {
+        @Override
+        public String toString() {
+            return "null";
+        }
+    }
+  learner_created: false
+- name: src/converter/js/JsArray.java
+  visible: true
+  text: |
+    package converter.js;
+
+    import java.util.List;
+    import java.util.StringJoiner;
+
+    public class JsArray extends JsValue {
+        protected final List<JsValue> values;
+
+        public JsArray(List<JsValue> values) {
+            this.values = values;
+        }
+
+        @Override
+        public boolean isSimple() {
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            final StringJoiner joiner = new StringJoiner(", ");
+            for (JsValue value : values) {
+                joiner.add(value.toString());
+            }
+            return String.format("[%s]", joiner);
+        }
+    }
+  learner_created: false
+- name: src/converter/js/JsValue.java
+  visible: true
+  text: |
+    package converter.js;
+
+    public abstract class JsValue {
+        public String toPretty() {
+            return toString();
+        }
+
+        public boolean isSimple() {
+            return true;
+        }
+    }
+  learner_created: false
+- name: src/converter/js/JsDouble.java
+  visible: true
+  text: |
+    package converter.js;
+
+    public class JsDouble extends JsNumber {
+        protected final double value;
+
+        public JsDouble(double value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return Double.toString(value);
+        }
+    }
+  learner_created: false
+- name: src/converter/js/JsEntity.java
+  visible: true
+  text: |
+    package converter.js;
+
+    public class JsEntity {
+        protected final String name;
+        protected final JsValue value;
+
+        public JsEntity(String name, JsValue value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("\"%s\": %s", name, value);
+        }
+    }
+  learner_created: false
+- name: src/converter/js/JsNumber.java
+  visible: true
+  text: |
+    package converter.js;
+
+    public abstract class JsNumber extends JsValue {
+    }
+  learner_created: false
+- name: src/converter/js/JsObject.java
+  visible: true
+  text: |
+    package converter.js;
+
+    import java.util.List;
+    import java.util.StringJoiner;
+
+    public class JsObject extends JsValue {
+        protected final List<JsEntity> values;
+
+        public JsObject(List<JsEntity> values) {
+            this.values = values;
+        }
+
+        @Override
+        public boolean isSimple() {
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            final StringJoiner joiner = new StringJoiner(", ");
+            for (JsEntity value : values) {
+                joiner.add(value.toString());
+            }
+            return String.format("{%s}", joiner);
+        }
+    }
+  learner_created: false
+- name: src/converter/js/JsParser.java
+  visible: true
+  text: |
+    package converter.js;
+
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+
+    public class JsParser {
+        protected static final Pattern NAME_PATTERN = Pattern.compile("\\s*\"[^\"]*\"\\s*:\\s*");
+        protected static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+(\\.\\d+)?");
+        protected static final String NULL = "null";
+        protected static final String TRUE = "true";
+        protected static final String FALSE = "false";
+        protected static final char OPENING_BRACE = '{';
+        protected static final char CLOSING_BRACE = '}';
+        protected static final char QUOTE = '"';
+        protected static final char OPENING_SQUARE_BRACKET = '[';
+        protected static final char CLOSING_SQUARE_BRACKET = ']';
+
+        public JsObject parse(String input) {
+            final List<EntityRaw> raw = raw(input);
+            return convert(raw);
+        }
+
+        protected List<EntityRaw> raw(String input) {
+            final List<EntityRaw> rawList = new ArrayList<>();
+            final String target = getValueFromBraces(input);
+            final Matcher matcher = NAME_PATTERN.matcher(target);
+            int index = 0;
+            while (matcher.find(index)) {
+                final RawType type;
+                final String name = getValueFromQuotes(matcher.group());
+                final int valueBegin = matcher.end() + 1;
+                final int valueEnd;
+                final char ch = input.charAt(valueBegin);
+                if (ch == OPENING_BRACE) {
+                    type = RawType.OBJECT;
+                    int opened = 0;
+                    int closed = 0;
+                    int currentIndex = valueBegin + 1;
+                    while (true) {
+                        final int openedIndex = input.indexOf(OPENING_BRACE, currentIndex);
+                        final int closingIndex = input.indexOf(CLOSING_BRACE, currentIndex);
+                        if (openedIndex == -1 || openedIndex > closingIndex) {
+                            if (opened == closed) {
+                                valueEnd = closingIndex + 1;
+                                break;
+                            }
+                            closed++;
+                            currentIndex = closingIndex + 1;
+                        } else {
+                            opened++;
+                            currentIndex = openedIndex + 1;
+                        }
+                    }
+                } else if (ch == QUOTE) {
+                    type = RawType.STRING;
+                    valueEnd = input.indexOf(QUOTE, valueBegin + 1) + 1;
+                } else if (ch == NULL.charAt(0)) {
+                    type = RawType.NULL;
+                    valueEnd = valueBegin + NULL.length();
+                } else if (ch == TRUE.charAt(0)) {
+                    type = RawType.BOOLEAN;
+                    valueEnd = valueBegin + TRUE.length();
+                } else if (ch == FALSE.charAt(0)) {
+                    type = RawType.BOOLEAN;
+                    valueEnd = valueBegin + FALSE.length();
+                } else if (Character.isDigit(ch)) {
+                    type = RawType.NUMBER;
+                    final Matcher numberMatcher = NUMBER_PATTERN.matcher(input);
+                    if (numberMatcher.find(valueBegin)) {
+                        valueEnd = numberMatcher.end();
+                    } else {
+                        throw new IllegalArgumentException("Unknown number starting character: " + ch);
+                    }
+                } else if (ch == OPENING_SQUARE_BRACKET) {
+                    type = RawType.ARRAY;
+                    valueEnd = input.indexOf(CLOSING_SQUARE_BRACKET, valueBegin) + 1;
+                } else {
+                    throw new IllegalArgumentException("Unknown value starting character: " + ch);
+                }
+                final String value = input.substring(valueBegin, valueEnd);
+                rawList.add(new EntityRaw(type, name, value));
+                if (valueEnd == input.length() - 1) {
+                    break;
+                }
+                index = valueEnd;
+            }
+            return rawList;
+        }
+
+        protected JsObject convert(List<EntityRaw> rawList) {
+            final ArrayList<JsEntity> entities = new ArrayList<>(rawList.size());
+            for (EntityRaw raw : rawList) {
+                final JsValue value;
+                if (raw.type == RawType.OBJECT) {
+                    value = convert(raw(raw.value));
+                } else if (raw.type == RawType.STRING) {
+                    value = new JsString(getValueFromQuotes(raw.value));
+                } else if (raw.type == RawType.NULL) {
+                    value = new JsNull();
+                } else if (raw.type == RawType.BOOLEAN) {
+                    value = new JsBoolean("true".equals(raw.value));
+                } else if (raw.type == RawType.NUMBER) {
+                    value = raw.value.contains(".")
+                            ? new JsDouble(Double.parseDouble(raw.value))
+                            : new JsInteger(Integer.parseInt(raw.value));
+                } else if (raw.type == RawType.ARRAY) {
+                    throw new UnsupportedOperationException("Array is unsupported");
+                } else {
+                    throw new IllegalArgumentException("Unknown raw type: " + raw.type);
+                }
+                entities.add(new JsEntity(raw.name, value));
+            }
+            return new JsObject(entities);
+        }
+
+        protected String getValueFromBraces(String input) {
+            return input.substring(input.indexOf("{") + 1, input.lastIndexOf("}"));
+        }
+
+        protected String getValueFromQuotes(String input) {
+            final int nameBegin = input.indexOf(QUOTE) + 1;
+            final int nameEnd = input.indexOf(QUOTE, nameBegin);
+            return input.substring(nameBegin, nameEnd);
+        }
+
+        protected enum RawType {
+            OBJECT,
+            STRING,
+            NULL,
+            BOOLEAN,
+            NUMBER,
+            ARRAY
+        }
+
+        protected static class EntityRaw {
+            final RawType type;
+            final String name;
+            final String value;
+
+            public EntityRaw(RawType type, String name, String value) {
+                this.type = type;
+                this.name = name;
+                this.value = value;
+            }
+
+        }
+    }
+  learner_created: false
+- name: src/converter/js/JsString.java
+  visible: true
+  text: |
+    package converter.js;
+
+    public class JsString extends JsValue {
+        protected final String value;
+
+        public JsString(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toPretty() {
+            return String.format("\"%s\"", value);
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+  learner_created: false
+- name: src/converter/js/JsBoolean.java
+  visible: true
+  text: |
+    package converter.js;
+
+    public class JsBoolean extends JsValue {
+        protected final boolean value;
+
+        public JsBoolean(boolean value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(value);
+        }
+    }
+  learner_created: false
+- name: src/converter/js/JsInteger.java
+  visible: true
+  text: |
+    package converter.js;
+
+    public class JsInteger extends JsNumber {
+        protected final int value;
+
+        public JsInteger(int value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return Integer.toString(value);
+        }
+    }
+  learner_created: false
+- name: src/converter/js/JsPrinter.java
+  visible: true
+  text: |
+    package converter.js;
+
+    import java.io.PrintStream;
+
+    public class JsPrinter {
+        protected final PrintStream printer;
+
+        public JsPrinter() {
+            this.printer = System.out;
+        }
+
+        public void print(JsObject object) {
+
+        }
+    }
+  learner_created: false
+- name: src/converter/js/JsConverter.java
+  visible: true
+  text: |
+    package converter.js;
+
+    import converter.x.*;
+
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.Objects;
+    import java.util.stream.Collectors;
+
+    public class JsConverter {
+        public List<XElement> convert(JsObject json) {
+            final List<XElement> elements = new ArrayList<>();
+            final List<JsEntity> entities = json.values;
+            for (JsEntity entity : entities) {
+                if ("".equals(entity.name) || "@".equals(entity.name) || "#".equals(entity.name)) continue;
+                final String name;
+                if (entity.name.startsWith("@") || entity.name.startsWith("#")) {
+                    name = entity.name.substring(1);
+                    if (entities.stream().map(e -> e.name).anyMatch(name::equals)) continue;
+                } else {
+                    name = entity.name;
+                }
+                final JsValue value = entity.value;
+                if (value.isSimple()) {
+                    if (value instanceof JsNull) {
+                        elements.add(new XElement(name));
+                    } else {
+                        elements.add(new XElement(name, new XSimpleValue(value.toString())));
+                    }
+                } else if (value instanceof JsObject) {
+                    final JsObject object = (JsObject) value;
+                    final boolean isXml = isXml(name, object);
+                    if (isXml) {
+                        final boolean hasXmlAttributes = hasXmlAttributes(object);
+                        if (hasXmlAttributes && hasXmlValue(name, object)) {
+                            final XAttributes xmlAttributes = getXmlAttributes(object);
+                            final XValue xmlValue = getXmlValue(name, object);
+                            if (xmlValue == null) {
+                                elements.add(new XElement(name, xmlAttributes));
+                            } else {
+                                elements.add(new XElement(name, xmlAttributes, xmlValue));
+                            }
+                        } else {
+                            final XValue xmlValue = getXmlValue(name, object);
+                            if (xmlValue == null) {
+                                elements.add(new XElement(name));
+                            } else {
+                                elements.add(new XElement(name, xmlValue));
+                            }
+                        }
+                    } else {
+                        final List<XElement> children = convert(object);
+                        if (children.isEmpty()) {
+                            elements.add(new XElement(name, new XSimpleValue()));
+                        } else {
+                            final XElements xmlElements = new XElements(children);
+                            elements.add(new XElement(name, xmlElements));
+                        }
+                    }
+                } else {
+                    throw new UnsupportedOperationException("Unsupported JSON value type: " + value);
+                }
+            }
+            return elements;
+        }
+
+        private boolean isXml(String name, JsObject object) {
+            final boolean isValid = object.values
+                    .stream()
+                    .allMatch(o -> o.name.length() > 1
+                            && ((o.name.startsWith("@") && o.value.isSimple()) || o.name.startsWith("#")));
+            if (!isValid) {
+                return false;
+            }
+            final List<String> values = object.values
+                    .stream()
+                    .map(e -> e.name)
+                    .filter(s -> s.startsWith("#"))
+                    .collect(Collectors.toList());
+            return values.size() == 1 && ("#" + name).equals(values.get(0));
+        }
+
+        private boolean hasXmlAttributes(JsObject object) {
+            return object.values.stream().map(e -> e.name).anyMatch(n -> n.startsWith("@") && n.length() > 1);
+        }
+
+        private boolean hasXmlValue(String name, JsObject object) {
+            return object.values.stream().anyMatch(e -> ("#" + name).equals(e.name));
+        }
+
+        private XAttributes getXmlAttributes(JsObject object) {
+            return new XAttributes(object.values.stream()
+                    .filter(e -> e.name.startsWith("@") && e.name.length() > 1)
+                    .map(this::getXmlAttribute)
+                    .collect(Collectors.toList()));
+        }
+
+        private XAttribute getXmlAttribute(JsEntity entity) {
+            final String name = entity.name.substring(1);
+            final String value;
+            if (entity.value instanceof JsNull) {
+                value = "";
+            } else {
+                value = entity.value.toString();
+            }
+            return new XAttribute(name, value);
+        }
+
+        private XValue getXmlValue(String name, JsObject object) {
+            return object.values.stream()
+                    .filter(e -> ("#" + name).equals(e.name))
+                    .limit(1)
+                    .filter(e -> !(e.value instanceof JsNull))
+                    .map(e -> {
+                        if (e.value.isSimple()) {
+                            return new XSimpleValue(e.value.toString());
+                        } else {
+                            final List<XElement> children = convert((JsObject) e.value);
+                            if (children.isEmpty()) {
+                                return new XSimpleValue();
+                            } else {
+                                return new XElements(children);
+                            }
+                        }
+                    })
+                    .findFirst()
+                    .orElse(null);
+        }
+    }
+  learner_created: false
+- name: src/converter/x/XValue.java
+  visible: true
+  text: |
+    package converter.x;
+
+    public abstract class XValue {
+    }
+  learner_created: false
+- name: src/converter/x/XParser.java
+  visible: true
+  text: |
+    package converter.x;
+
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+
+    public class XParser {
+        protected static final String START = "<";
+        protected static final String END = ">";
+        protected static final String SLASH = "/";
+        protected static final String START_SLASH = START + SLASH;
+        protected static final String SLASH_END = SLASH + END;
+
+        public XElement parse(String input) {
+            final List<String> parts = split(input);
+            final List<Raw> rawList = raw(parts);
+            return convert(rawList);
+        }
+
+        private List<String> split(String input) {
+            final List<String> substrings = new ArrayList<>();
+            String ch = END;
+            int begin = 0;
+            int end;
+            while ((end = input.indexOf(ch, begin)) != -1) {
+                final boolean isStart = START.equals(ch);
+                ch = isStart ? END : START;
+                final String substring = input.substring(begin, (begin = isStart ? end : end + 1)).trim();
+                if (!substring.isEmpty()) {
+                    substrings.add(substring);
+                }
+            }
+            return substrings;
+        }
+
+        private List<Raw> raw(List<String> parts) {
+            final List<Raw> list = new ArrayList<>(parts.size());
+            for (String part : parts) {
+                if (isTag(part)) {
+                    final String name = getTagName(part);
+                    if (isClosingTag(part)) {
+                        list.add(Raw.closing(name, part));
+                    } else if (isEmptyTag(part)) {
+                        list.add(Raw.empty(name, part));
+                    } else {
+                        list.add(Raw.open(name, part));
+                    }
+                } else {
+                    list.add(Raw.value(part));
+                }
+            }
+            return list;
+        }
+
+        private XElement convert(List<Raw> rawList) {
+            final Raw parent = rawList.get(0);
+            final List<XElement> values = new ArrayList<>();
+            XSimpleValue simpleValue = null;
+            for (int i = 1; i < rawList.size() - 1; i++) {
+                final Result result = convert(rawList, i);
+                if (result.value instanceof XSimpleValue) {
+                    simpleValue = (XSimpleValue) result.value;
+                    break;
+                }
+                values.add((XElement) result.value);
+                i = result.lastIndex;
+            }
+            final XElement element;
+            if (simpleValue != null) {
+                element = getElement(parent, simpleValue);
+            } else {
+                element = getElement(parent, getValue(values));
+            }
+            return element;
+        }
+
+        private Result convert(List<Raw> rawList, int from) {
+            final Raw parent = rawList.get(from);
+            if (parent.type == RawType.EMPTY) {
+                if (hasAttributes(parent.value)) {
+                    return new Result(from, new XElement(parent.name, getAttributes(parent)));
+                } else {
+                    return new Result(from, new XElement(parent.name));
+                }
+            } else if (parent.type == RawType.VALUE) {
+                return new Result(from + 1, new XSimpleValue(parent.value));
+            } else if (parent.type == RawType.CLOSING) {
+                return new Result(from, new XSimpleValue());
+            }
+            final List<XElement> values = new ArrayList<>();
+            XSimpleValue simpleValue = null;
+            boolean isOpen = true;
+            int countOpen = 1;
+            int countClosed = 0;
+            int index;
+            for (index = from + 1; isOpen && index < rawList.size(); index++) {
+                final Raw raw = rawList.get(index);
+                switch (raw.type) {
+                    case EMPTY: {
+                        if (hasAttributes(raw.value)) {
+                            values.add(new XElement(raw.name, getAttributes(raw)));
+                        } else {
+                            values.add(new XElement(raw.name));
+                        }
+                        break;
+                    }
+                    case OPEN: {
+                        final Result result = convert(rawList, index + 1);
+                        if (hasAttributes(raw.value)) {
+                            values.add(new XElement(raw.name, getAttributes(raw), result.value));
+                        } else {
+                            values.add(new XElement(raw.name, result.value));
+                        }
+                        index = result.lastIndex;
+                        break;
+                    }
+                    case VALUE: {
+                        simpleValue = new XSimpleValue(raw.value);
+                        isOpen = false;
+                        index++;
+                        break;
+                    }
+                    case CLOSING: {
+                        if (parent.name.equals(raw.name) && countOpen == ++countClosed) {
+                            isOpen = false;
+                        }
+                        break;
+                    }
+                    default: {
+                        throw new IllegalArgumentException("Unknown raw type: " + raw.type);
+                    }
+                }
+            }
+            final XElement element;
+            if (simpleValue != null) {
+                element = getElement(parent, simpleValue);
+            } else {
+                element = getElement(parent, getValue(values));
+            }
+            return new Result(index - 1, element);
+        }
+
+        private XElement getElement(Raw raw, XValue value) {
+            if (hasAttributes(raw.value)) {
+                return new XElement(raw.name, getAttributes(raw), value);
+            } else {
+                return new XElement(raw.name, value);
+            }
+        }
+
+        private XAttributes getAttributes(Raw raw) {
+            final int beginIndex = START.length() + raw.name.length();
+            final String rawValue = raw.value;
+            final int rawLength = rawValue.length();
+            final int endIndex = rawValue.endsWith(SLASH_END)
+                    ? rawLength - SLASH_END.length()
+                    : rawLength - END.length();
+            final String value = rawValue.substring(beginIndex, endIndex);
+            final Matcher matcher = Pattern.compile("\\w+(\\s*=\\s*\"\\w*\")?").matcher(value);
+            final ArrayList<XAttribute> attributes = new ArrayList<>();
+            while (matcher.find()) {
+                final String rawAttribute = matcher.group();
+                attributes.add(getAttribute(rawAttribute));
+            }
+            return new XAttributes(attributes);
+        }
+
+        private XAttribute getAttribute(String attribute) {
+            if (attribute.matches("\\w+\\s*=.*")) {
+                final int index = attribute.indexOf("=");
+                final String name = attribute.substring(0, index).trim();
+                final String quotedValue = attribute.substring(index + 1).trim();
+                final String value = quotedValue.substring(1, quotedValue.length() - 1);
+                return new XAttribute(name, value);
+            } else {
+                return new XAttribute(attribute.trim());
+            }
+        }
+
+        private XValue getValue(List<XElement> values) {
+            if (values.isEmpty()) {
+                return new XSimpleValue();
+            } else if (values.size() == 1) {
+                return values.get(0);
+            } else {
+                return new XElements(values);
+            }
+        }
+
+        private boolean isTag(String tag) {
+            return tag.startsWith(START) && tag.endsWith(END);
+        }
+
+        private boolean isEmptyTag(String tag) {
+            return tag.startsWith(START) && tag.endsWith(SLASH_END);
+        }
+
+        private boolean isClosingTag(String tag) {
+            return tag.startsWith(START_SLASH) && tag.endsWith(END);
+        }
+
+        private boolean hasAttributes(String tag) {
+            return tag.matches("<\\w+\\s+\\w.*/?>");
+        }
+
+        private String getTagName(String tag) {
+            final Matcher matcher = Pattern.compile("(\\s|" + SLASH_END + "|" + END + ")").matcher(tag);
+            if (matcher.find()) {
+                final int begin = tag.startsWith(START_SLASH) ? START_SLASH.length() : START.length();
+                final int end = matcher.start();
+                return tag.substring(begin, end);
+            }
+            throw new IllegalArgumentException("Illegal tag: " + tag);
+        }
+
+        private enum RawType {
+            OPEN, CLOSING, EMPTY, VALUE
+        }
+
+        private static class Raw {
+            final String name;
+            final String value;
+            final RawType type;
+
+            Raw(String name, String value, RawType type) {
+                this.name = name;
+                this.value = value;
+                this.type = type;
+            }
+
+            static Raw open(String name, String value) {
+                return new Raw(name, value, RawType.OPEN);
+            }
+
+            static Raw closing(String name, String value) {
+                return new Raw(name, value, RawType.CLOSING);
+            }
+
+            static Raw empty(String name, String value) {
+                return new Raw(name, value, RawType.EMPTY);
+            }
+
+            static Raw value(String value) {
+                return new Raw("", value, RawType.VALUE);
+            }
+        }
+
+        private static class Result {
+            final int lastIndex;
+            final XValue value;
+
+            Result(int lastIndex, XValue value) {
+                this.lastIndex = lastIndex;
+                this.value = value;
+            }
+        }
+    }
+  learner_created: false
+- name: src/converter/x/XElement.java
+  visible: true
+  text: |
+    package converter.x;
+
+    public class XElement extends XComplexValue {
+        protected final String name;
+        protected final XAttributes attributes;
+        protected final XValue value;
+
+        public XElement(String name) {
+            this(name, null, null);
+        }
+
+        public XElement(String name, XAttributes attributes) {
+            this(name, attributes, null);
+        }
+
+        public XElement(String name, XValue value) {
+            this(name, null, value);
+        }
+
+        public XElement(String name, XAttributes attributes, XValue value) {
+            this.name = name;
+            this.attributes = attributes;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            if (attributes == null && value == null) {
+                return String.format("<%s/>", name);
+            } else if (value == null) {
+                return String.format("<%s %s/>", name, attributes);
+            } else if (attributes == null) {
+                return String.format("<%s>%s</%s>", name, value, name);
+            } else {
+                return String.format("<%s %s>%s</%s>", name, attributes, value, name);
+            }
+        }
+    }
+  learner_created: false
+- name: src/converter/x/XElements.java
+  visible: true
+  text: |
+    package converter.x;
+
+    import java.util.List;
+
+    public class XElements extends XComplexValue {
+        protected final List<XElement> values;
+
+        public XElements(List<XElement> values) {
+            this.values = values;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder();
+            for (XElement value : values) {
+                builder.append(value);
+            }
+            return builder.toString();
+        }
+    }
+  learner_created: false
+- name: src/converter/x/XAttribute.java
+  visible: true
+  text: |
+    package converter.x;
+
+    public class XAttribute {
+        protected final String name;
+        protected final String value;
+
+        public XAttribute(String name) {
+            this(name, null);
+        }
+
+        public XAttribute(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value == null ? name : String.format("%s=\"%s\"", name, value);
+        }
+    }
+  learner_created: false
+- name: src/converter/x/XAttributes.java
+  visible: true
+  text: |
+    package converter.x;
+
+    import java.util.List;
+    import java.util.StringJoiner;
+
+    public class XAttributes {
+        protected final List<XAttribute> values;
+
+        public XAttributes(List<XAttribute> values) {
+            this.values = values;
+        }
+
+        @Override
+        public String toString() {
+            final StringJoiner joiner = new StringJoiner(" ");
+            for (XAttribute attribute : values) {
+                joiner.add(attribute.toString());
+            }
+            return joiner.toString();
+        }
+    }
+  learner_created: false
+- name: src/converter/x/XSimpleValue.java
+  visible: true
+  text: |
+    package converter.x;
+
+    public class XSimpleValue extends XValue {
+        protected final String value;
+
+        public XSimpleValue() {
+            this("");
+        }
+
+        public XSimpleValue(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+  learner_created: false
+- name: src/converter/xml/XmlValue.java
+  visible: true
+  text: |
+    package converter.xml;
+
+    import converter.Value;
+
+    public abstract class XmlValue extends Value {
+    }
+  learner_created: false
+- name: src/converter/xml/XmlSimpleValue.java
+  visible: true
+  text: |
+    package converter.xml;
+
+    public class XmlSimpleValue extends XmlValue {
+        private final String value;
+
+        public XmlSimpleValue() {
+            this("");
+        }
+
+        public XmlSimpleValue(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+  learner_created: false
+- name: src/converter/xml/XmlDocumentParser.java
+  visible: true
+  text: |
+    package converter.xml;
+
+    import converter.json.JsonValue;
+
+    import java.util.ArrayList;
+    import java.util.List;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+
+    public class XmlDocumentParser {
+        public static final String START = "<";
+        public static final String END = ">";
+        public static final String SLASH = "/";
+        public static final String START_SLASH = START + SLASH;
+        public static final String SLASH_END = SLASH + END;
+
+        public XmlElement parse(String input) {
+            final List<String> parts = split(input);
+            final List<Raw> raws = raw(parts);
+            final List<?> foo = convert(raws);
+            return null;
+        }
+
+        private List<String> split(String input) {
+            final List<String> substrings = new ArrayList<>();
+            String ch = END;
+            int begin = 0;
+            int end;
+            while ((end = input.indexOf(ch, begin)) != -1) {
+                final boolean isStart = START.equals(ch);
+                ch = isStart ? END : START;
+                final String substring = input.substring(begin, (begin = isStart ? end : end + 1));
+                if (!substring.isEmpty()) {
+                    substrings.add(substring.trim());
+                }
+            }
+            return substrings;
+        }
+
+        private List<Raw> raw(List<String> parts) {
+            final List<Raw> raws = new ArrayList<>(parts.size());
+            for (String part : parts) {
+                if (isTag(part)) {
+                    final String name = getTagName(part);
+                    if (isClosingTag(part)) {
+                        raws.add(Raw.closing(name, part));
+                    } else if (isEmptyTag(part)) {
+                        raws.add(Raw.empty(name, part));
+                    } else {
+                        raws.add(Raw.open(name, part));
+                    }
+                } else {
+                    raws.add(Raw.value(part));
+                }
+            }
+            return raws;
+        }
+
+        private List<?> convert(List<Raw> rawList) {
+            for (int i = 0; i < rawList.size(); i++) {
+                final Raw raw = rawList.get(i);
+                if (raw.type == RawType.EMPTY) {
+                    if (hasAttributes(raw.value)) {
+                        System.out.println(new XmlElement(raw.name, getAttributes(raw)));
+                    } else {
+                        System.out.println(new XmlElement(raw.name));
+                    }
+                } else if (raw.type == RawType.OPEN) {
+                    final Result result = convert(rawList, i + 1);
+                    if (hasAttributes(raw.value)) {
+                        System.out.println(new XmlElement(raw.name, result.value, getAttributes(raw)));
+                    } else {
+                        System.out.println(new XmlElement(raw.name, result.value));
+                    }
+                    i = result.to;
+                }
+            }
+            return null;
+        }
+
+        private Result convert(List<Raw> rawList, int from) {
+            for (int i = from; i < rawList.size(); i++) {
+                final Raw raw = rawList.get(i);
+                if (raw.type == RawType.EMPTY) {
+                    if (hasAttributes(raw.value)) {
+                        System.out.println(new XmlElement(raw.name, getAttributes(raw)));
+                    } else {
+                        System.out.println(new XmlElement(raw.name));
+                    }
+                } else if (raw.type == RawType.OPEN) {
+                    final Result result = convert(rawList, i + 1);
+                    if (hasAttributes(raw.value)) {
+                        System.out.println(new XmlElement(raw.name, result.value, getAttributes(raw)));
+                    } else {
+                        System.out.println(new XmlElement(raw.name, result.value));
+                    }
+                    i = result.to;
+                }
+            }
+            return null;
+        }
+
+        private List<XmlAttribute> getAttributes(Raw raw) {
+            final int beginIndex = START.length() + raw.name.length();
+            final String rawValue = raw.value;
+            final int rawLength = rawValue.length();
+            final int endIndex = rawValue.endsWith(SLASH_END)
+                    ? rawLength - SLASH_END.length()
+                    : rawLength - END.length();
+            final String value = rawValue.substring(beginIndex, endIndex);
+            final Matcher matcher = Pattern.compile("\\w+(\\s*=\\s*\".*\")?").matcher(value);
+            final ArrayList<XmlAttribute> attributes = new ArrayList<>();
+            while (matcher.find()) {
+                final String rawAttribute = matcher.group();
+                attributes.add(getAttribute(rawAttribute));
+            }
+            return attributes;
+        }
+
+        private XmlAttribute getAttribute(String attribute) {
+            if (attribute.matches("\\w+\\s*=.*")) {
+                final int index = attribute.indexOf("=");
+                final String name = attribute.substring(0, index).trim();
+                final String quotedValue = attribute.substring(index + 1).trim();
+                final String value = quotedValue.substring(1, quotedValue.length() - 1);
+                return new XmlAttribute(name, value);
+            } else {
+                return new XmlAttribute(attribute.trim());
+            }
+        }
+
+        private boolean isTag(String tag) {
+            return tag.startsWith(START) && tag.endsWith(END);
+        }
+
+        private boolean isEmptyTag(String tag) {
+            return tag.startsWith(START) && tag.endsWith(SLASH_END);
+        }
+
+        private boolean isClosingTag(String tag) {
+            return tag.startsWith(START_SLASH) && tag.endsWith(END);
+        }
+
+        private boolean hasAttributes(String tag) {
+            return tag.matches("<\\w+\\s+\\w.*/?>");
+        }
+
+        private String getTagName(String tag) {
+            final Matcher matcher = Pattern.compile("(\\s|" + SLASH_END + "|" + END + ")").matcher(tag);
+            if (matcher.find()) {
+                final int begin = tag.startsWith(START_SLASH) ? START_SLASH.length() : START.length();
+                final int end = matcher.start();
+                return tag.substring(begin, end);
+            }
+            throw new IllegalArgumentException("Illegal tag: " + tag);
+        }
+
+        private enum RawType {
+            OPEN, CLOSING, EMPTY, VALUE
+        }
+
+        private static class Result {
+            final int from;
+            final int to;
+            final XmlValue value;
+
+            Result(int from, int to, XmlValue value) {
+                this.from = from;
+                this.to = to;
+                this.value = value;
+            }
+        }
+
+        private static class Raw {
+            final String name;
+            final String value;
+            final RawType type;
+
+            Raw(String name, String value, RawType type) {
+                this.name = name;
+                this.value = value;
+                this.type = type;
+            }
+
+            static Raw open(String name, String value) {
+                return new Raw(name, value, RawType.OPEN);
+            }
+
+            static Raw closing(String name, String value) {
+                return new Raw(name, value, RawType.CLOSING);
+            }
+
+            static Raw empty(String name, String value) {
+                return new Raw(name, value, RawType.EMPTY);
+            }
+
+            static Raw value(String value) {
+                return new Raw("", value, RawType.VALUE);
+            }
+        }
     }
   learner_created: false
 - name: src/converter/Main.java
@@ -917,20 +2322,49 @@ files:
   text: |
     package converter;
 
+    import converter.js.JsConverter;
+    import converter.js.JsObject;
+    import converter.js.JsParser;
+    import converter.x.XElement;
+    import converter.x.XPrinter;
+
+    import java.io.File;
+    import java.io.FileReader;
+    import java.io.IOException;
+    import java.util.List;
+
     public class Main {
-        public static void main(String[] args) {
-            System.out.println("Hello World!");
+        public static void main(String[] args) throws IOException {
+            final JsObject json = new JsParser().parse(getInputFromFile());
+            final List<XElement> xmlList = new JsConverter().convert(json);
+            final XPrinter printer = new XPrinter();
+            for (XElement element : xmlList) {
+                printer.print(element);
+            }
+        }
+
+        private static String getInputFromFile() throws IOException {
+            final File file = new File("test.txt");
+            try (final FileReader reader = new FileReader(file)) {
+                final StringBuilder builder = new StringBuilder();
+                final char[] buffer = new char[1024];
+                int count;
+                while ((count = reader.read(buffer)) != -1) {
+                    builder.append(new String(buffer, 0, count));
+                }
+                return builder.toString();
+            }
         }
     }
   learner_created: false
-- name: src/converter/json/JsonPrimitive.java
+- name: src/converter/Value.java
   visible: true
   text: |
-    package converter.json;
+    package converter;
 
-    public abstract class JsonPrimitive extends JsonValue {
+    public abstract class Value {
     }
-  learner_created: true
+  learner_created: false
 feedback_link: https://hyperskill.org/projects/61/stages/333/implement
 status: Solved
-record: 2
+record: 4
