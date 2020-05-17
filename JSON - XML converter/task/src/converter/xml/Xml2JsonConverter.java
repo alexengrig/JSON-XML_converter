@@ -73,7 +73,7 @@ public class Xml2JsonConverter implements Converter<XmlElement, JsonObject> {
             value = new JsonString(simpleValue.value);
         } else if (element.value instanceof XmlElement) {
             final XmlElement child = (XmlElement) element.value;
-            value = convertValue(child);
+            value = new JsonObject(child.name, convertValue(child));
         } else if (element.value instanceof XmlElements) {
             final XmlElements children = (XmlElements) element.value;
             if (isArray(children)) {
