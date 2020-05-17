@@ -17,7 +17,7 @@ public class Xml2JsonConverter implements Converter<XmlElement, JsonObject> {
             value = convertValue(xml);
         } else if (xml.value instanceof XmlElement) {
             final XmlElement element = (XmlElement) xml.value;
-            value = convertValue(element);
+            value = new JsonObject(element.name, convertValue(element));
         } else if (xml.value instanceof XmlElements) {
             final XmlElements elements = (XmlElements) xml.value;
             if (isArray(elements)) {
@@ -82,6 +82,13 @@ public class Xml2JsonConverter implements Converter<XmlElement, JsonObject> {
                     array.add(convertValue(child));
                 }
                 value = new JsonArray(array);
+                if (element.attributes == null) {
+                    return value;
+                }
+                final List<JsonEntity> attributes = convertAttributes(element.attributes);
+                final List<JsonEntity> entities = new ArrayList<>(attributes);
+                entities.add(new JsonEntity(getValueName(element), value));
+                return new JsonObject(element.name, new JsonObject(entities));
             } else {
                 final ArrayList<JsonEntity> entities = new ArrayList<>();
                 for (XmlElement child : children.values) {
