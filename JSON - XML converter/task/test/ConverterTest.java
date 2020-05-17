@@ -35,17 +35,17 @@ public class ConverterTest extends StageTest<Clue> {
         allTests = new LinkedHashMap<>();
 
         allTests.put(
-                "{\n" +
-                "    \"transactions\": {\n" +
-                "        \"id\": \"6753322\",\n" +
-                "        \"data\": [\n" +
-                "            124,\n" +
-                "            true,\n" +
-                "            false,\n" +
-                "            [ ],\n" +
-                "            [],\n" +
-                "            { },\n" +
-                "            {},\n" +
+            "{\n" +
+                    "    \"transactions\": {\n" +
+                    "        \"id\": \"6753322\",\n" +
+                    "        \"data\": [\n" +
+                    "            124,\n" +
+                    "            true,\n" +
+                    "            false,\n" +
+                    "            [ ],\n" +
+                    "            [],\n" +
+                    "            { },\n" +
+                    "            {},\n" +
                 "            [\n" +
                 "                1, 2, 3,\n" +
                 "                {\n" +
