@@ -119,12 +119,8 @@ public class XmlParser implements Parser<XmlElement> {
                     break;
                 }
                 case OPEN: {
-                    final Result result = convert(rawList, index + 1);
-                    if (hasAttributes(raw.value)) {
-                        values.add(new XmlElement(raw.name, getAttributes(raw), result.value));
-                    } else {
-                        values.add(new XmlElement(raw.name, result.value));
-                    }
+                    final Result result = convert(rawList, index);
+                    values.add((XmlElement) result.value);
                     index = result.lastIndex;
                     break;
                 }
@@ -256,6 +252,11 @@ public class XmlParser implements Parser<XmlElement> {
 
         static Raw value(String value) {
             return new Raw("", value, RawType.VALUE);
+        }
+
+        @Override
+        public String toString() {
+            return "Raw{" + name + "/" + type + '}';
         }
     }
 
