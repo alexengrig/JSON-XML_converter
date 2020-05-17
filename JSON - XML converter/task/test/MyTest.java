@@ -221,4 +221,46 @@ public class MyTest {
                 "    </transaction>\n" +
                 "</root>");
     }
+
+    @Test
+    public void test4CrazyAttributes() {
+        doTestXml2Json("" +
+                "{\n" +
+                "  \"root\": {\n" +
+                "    \"transaction\": {\n" +
+                "      \"crazyattr1\": {\n" +
+                "        \"@attr1\": \"123\",\n" +
+                "        \"#crazyattr1\": \"v15\"\n" +
+                "      },\n" +
+                "      \"crazyattr2\": {\n" +
+                "        \"@attr1\": \"123.456\",\n" +
+                "        \"#crazyattr2\": \"v16\"\n" +
+                "      },\n" +
+                "      \"crazyattr3\": {\n" +
+                "        \"@attr1\": \"\",\n" +
+                "        \"#crazyattr3\": \"v17\"\n" +
+                "      },\n" +
+                "      \"crazyattr9\": {\n" +
+                "        \"attr1\": {\n" +
+                "          \"key\": \"4\"\n" +
+                "        },\n" +
+                "        \"crazyattr9\": \"v23\"\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}", "" +
+                "<root>\n" +
+                "    <transaction>\n" +
+                "        <crazyattr1 attr1='123'>v15</crazyattr1>\n" +
+                "        <crazyattr2 attr1=\"123.456\">v16</crazyattr2>\n" +
+                "        <crazyattr3 attr1=''>v17</crazyattr3>\n" +
+                "        <crazyattr9>\n" +
+                "            <attr1>\n" +
+                "                <key>4</key>\n" +
+                "            </attr1>\n" +
+                "            <crazyattr9>v23</crazyattr9>\n" +
+                "        </crazyattr9>\n" +
+                "    </transaction>\n" +
+                "</root>");
+    }
 }
