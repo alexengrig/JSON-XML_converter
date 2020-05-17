@@ -1,0 +1,124 @@
+{
+  "root": {
+    "transaction": {
+      "id": "6753322",
+      "number": {
+        "@region": "Russia",
+        "#number": "8-900-000-000"
+      },
+      "special1": "false",
+      "special2": "true",
+      "empty1": null,
+      "empty2": "",
+      "array1": [
+        null,
+        null
+      ],
+      "array2": [
+        "",
+        null,
+        "123",
+        "123.456",
+        {
+          "key1": "value1",
+          "key2": {
+            "@attr": "value2",
+            "#key2": "value3"
+          }
+        },
+        {
+          "@attr2": "value4",
+          "#element": "value5"
+        },
+        {
+          "attr3": "value4",
+          "elem": "value5"
+        },
+        {
+          "deep": {
+            "@deepattr": "deepvalue",
+            "#deep": [
+              "1",
+              "2",
+              "3"
+            ]
+          }
+        }
+      ],
+      "inner1": {
+        "inner2": {
+          "inner3": {
+            "key1": "value1",
+            "key2": "value2"
+          }
+        }
+      },
+      "inner4": {
+        "inner4": "value3"
+      },
+      "inner5": {
+        "attr1": "123.456",
+        "inner4": "value4"
+      },
+      "inner6": {
+        "@attr2": "789.321",
+        "#inner6": "value5"
+      },
+      "inner7": "value6",
+      "inner8": {
+        "attr3": "value7"
+      },
+      "inner9": {
+        "attr4": "value8",
+        "inner9": "value9",
+        "something": "value10"
+      },
+      "inner10": {
+        "@attr5": "",
+        "#inner10": null
+      },
+      "inner11": {
+        "@attr11": "value11",
+        "#inner11": {
+          "inner12": {
+            "@attr12": "value12",
+            "#inner12": {
+              "inner13": {
+                "@attr13": "value13",
+                "#inner13": {
+                  "inner14": "v14"
+                }
+              }
+            }
+          }
+        }
+      },
+      "inner15": "",
+      "inner16": {
+        "somekey": "keyvalue",
+        "inner16": "notnull"
+      },
+      "crazyattr1": {
+        "@attr1": "123",
+        "#crazyattr1": "v15"
+      },
+      "crazyattr2": {
+        "@attr1": "123.456",
+        "#crazyattr2": "v16"
+      },
+      "crazyattr3": {
+        "@attr1": "",
+        "#crazyattr3": "v17"
+      },
+      "crazyattr9": {
+        "attr1": {
+          "key": "4"
+        },
+        "crazyattr9": "v23"
+      }
+    },
+    "meta": {
+      "version": "0.01"
+    }
+  }
+}
