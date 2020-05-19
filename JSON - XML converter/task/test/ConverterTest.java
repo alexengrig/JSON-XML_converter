@@ -46,16 +46,16 @@ public class ConverterTest extends StageTest<Clue> {
                     "            [],\n" +
                     "            { },\n" +
                     "            {},\n" +
-                "            [\n" +
-                "                1, 2, 3,\n" +
-                "                {\n" +
-                "                    \"@attr\": \"value6\",\n" +
-                "                    \"#element\": \"value7\"\n" +
-                "                }\n" +
-                "            ],\n" +
-                "            null,\n" +
-                "            \"\",\n" +
-                "            {\n" +
+                    "            [\n" +
+                    "                1, 2, 3,\n" +
+                    "                {\n" +
+                    "                    \"@attr\": \"value6\",\n" +
+                    "                    \"#element\": \"value7\"\n" +
+                    "                }\n" +
+                    "            ],\n" +
+                    "            null,\n" +
+                    "            \"\",\n" +
+                    "            {\n" +
                 "                \"key1\": \"value1\",\n" +
                 "                \"key2\": {\n" +
                 "                    \"@attr\": \"value2\",\n" +
