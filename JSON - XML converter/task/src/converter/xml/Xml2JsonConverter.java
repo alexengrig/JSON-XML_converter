@@ -12,12 +12,23 @@ public class Xml2JsonConverter implements Converter<XmlElement, JsonObject> {
 
     @Override
     public JsonObject convert(XmlElement xml) {
-        final JsonValue value;
-        if (xml.value instanceof XmlSimpleValue) {
-            value = convertValue(xml);
+        return new JsonObject(xml.name, convertValue(xml));
+    }
+
+    private JsonEntity convertEntity(XmlElement xml) {
+        return new JsonEntity(xml.name, convertValue(xml));
+    }
+
+    private JsonValue convertValue(XmlElement xml) {
+        JsonValue value;
+        if (xml.value == null) {
+            value = new JsonNull();
+        } else if (xml.value instanceof XmlSimpleValue) {
+            XmlSimpleValue simpleValue = (XmlSimpleValue) xml.value;
+            value = new JsonString(simpleValue.value);
         } else if (xml.value instanceof XmlElement) {
             final XmlElement element = (XmlElement) xml.value;
-            value = new JsonObject(element.name, convertValue(element));
+            value = convert(element);
         } else if (xml.value instanceof XmlElements) {
             final XmlElements elements = (XmlElements) xml.value;
             if (isArray(elements)) {
@@ -27,26 +38,21 @@ public class Xml2JsonConverter implements Converter<XmlElement, JsonObject> {
                 }
                 value = new JsonArray(array);
             } else {
-                final List<JsonEntity> values = new ArrayList<>();
+                final List<JsonEntity> entities = new ArrayList<>();
                 for (XmlElement element : elements.values) {
-                    values.add(new JsonEntity(element.name, convertValue(element)));
+                    entities.add(convertEntity(element));
                 }
-                value = new JsonObject(values);
+                value = new JsonObject(entities);
             }
         } else {
             throw new IllegalArgumentException("Unknown Xml value type: " + xml.value);
         }
         if (xml.attributes == null) {
-            return new JsonObject(xml.name, value);
+            return value;
         }
-        final List<JsonEntity> attributes = convertAttributes(xml.attributes);
-        final List<JsonEntity> entities = new ArrayList<>(attributes);
-        entities.add(new JsonEntity(getValueName(xml), value));
-        return new JsonObject(xml.name, new JsonObject(entities));
-    }
-
-    private String getValueName(XmlElement xml) {
-        return VALUE_PREFIX + xml.name;
+        final List<JsonEntity> entities = new ArrayList<>(convertAttributes(xml.attributes));
+        entities.add(new JsonEntity(VALUE_PREFIX + xml.name, value));
+        return new JsonObject(entities);
     }
 
     private List<JsonEntity> convertAttributes(XmlAttributes attributes) {
@@ -62,50 +68,6 @@ public class Xml2JsonConverter implements Converter<XmlElement, JsonObject> {
             new JsonNull();
         }
         return new JsonEntity(ATTRIBUTE_PREFIX + attribute.name, new JsonString(attribute.value));
-    }
-
-    private JsonValue convertValue(XmlElement element) {
-        final JsonValue value;
-        if (element.value == null) {
-            value = new JsonNull();
-        } else if (element.value instanceof XmlSimpleValue) {
-            final XmlSimpleValue simpleValue = (XmlSimpleValue) element.value;
-            value = new JsonString(simpleValue.value);
-        } else if (element.value instanceof XmlElement) {
-            final XmlElement child = (XmlElement) element.value;
-            value = new JsonObject(child.name, convertValue(child));
-        } else if (element.value instanceof XmlElements) {
-            final XmlElements children = (XmlElements) element.value;
-            if (isArray(children)) {
-                final List<JsonValue> array = new ArrayList<>();
-                for (XmlElement child : children.values) {
-                    array.add(convertValue(child));
-                }
-                value = new JsonArray(array);
-                if (element.attributes == null) {
-                    return value;
-                }
-                final List<JsonEntity> attributes = convertAttributes(element.attributes);
-                final List<JsonEntity> entities = new ArrayList<>(attributes);
-                entities.add(new JsonEntity(getValueName(element), value));
-                return new JsonObject(element.name, new JsonObject(entities));
-            } else {
-                final ArrayList<JsonEntity> entities = new ArrayList<>();
-                for (XmlElement child : children.values) {
-                    entities.add(new JsonEntity(child.name, convertValue(child)));
-                }
-                value = new JsonObject(entities);
-            }
-        } else {
-            throw new IllegalArgumentException("Unknown element value: " + element.value);
-        }
-        if (element.attributes == null) {
-            return value;
-        }
-        final List<JsonEntity> attributes = convertAttributes(element.attributes);
-        final List<JsonEntity> entities = new ArrayList<>(attributes);
-        entities.add(new JsonEntity(getValueName(element), value));
-        return new JsonObject(entities);
     }
 
     private boolean isArray(XmlElements elements) {
